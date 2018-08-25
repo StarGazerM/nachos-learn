@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "*.vue": "html",
+        "initializer_list": "cpp",
+        "type_traits": "cpp",
+        "xstring": "cpp",
+        "xmemory0": "cpp",
+        "xutility": "cpp"
+    }
+}
