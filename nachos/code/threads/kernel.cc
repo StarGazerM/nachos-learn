@@ -26,54 +26,77 @@
 
 Kernel::Kernel(int argc, char **argv)
 {
-    randomSlice = FALSE; 
+    quantum = 0;
+    randomSlice = FALSE;
     debugUserProg = FALSE;
-    consoleIn = NULL;          // default is stdin
-    consoleOut = NULL;         // default is stdout
+    consoleIn = NULL;  // default is stdin
+    consoleOut = NULL; // default is stdout
 #ifndef FILESYS_STUB
     formatFlag = FALSE;
 #endif
-    reliability = 1;            // network reliability, default is 1.0
-    hostName = 0;               // machine id, also UNIX socket name
-                                // 0 is the default machine id
-    for (int i = 1; i < argc; i++) {
-        if (strcmp(argv[i], "-rs") == 0) {
- 	    ASSERT(i + 1 < argc);
-	    RandomInit(atoi(argv[i + 1]));// initialize pseudo-random
-					// number generator
-	    randomSlice = TRUE;
-	    i++;
-        } else if (strcmp(argv[i], "-s") == 0) {
+    reliability = 1; // network reliability, default is 1.0
+    hostName = 0;    // machine id, also UNIX socket name
+                     // 0 is the default machine id
+    for (int i = 1; i < argc; i++)
+    {
+        if (strcmp(argv[i], "-rs") == 0)
+        {
+            ASSERT(i + 1 < argc);
+            RandomInit(atoi(argv[i + 1])); // initialize pseudo-random
+                // number generator
+            randomSlice = TRUE;
+            i++;
+        }
+        else if (strcmp(argv[i], "-s") == 0)
+        {
             debugUserProg = TRUE;
-	} else if (strcmp(argv[i], "-ci") == 0) {
-	    ASSERT(i + 1 < argc);
-	    consoleIn = argv[i + 1];
-	    i++;
-	} else if (strcmp(argv[i], "-co") == 0) {
-	    ASSERT(i + 1 < argc);
-	    consoleOut = argv[i + 1];
-	    i++;
+        }
+        else if (strcmp(argv[i], "-ci") == 0)
+        {
+            ASSERT(i + 1 < argc);
+            consoleIn = argv[i + 1];
+            i++;
+        }
+        else if (strcmp(argv[i], "-co") == 0)
+        {
+            ASSERT(i + 1 < argc);
+            consoleOut = argv[i + 1];
+            i++;
 #ifndef FILESYS_STUB
-	} else if (strcmp(argv[i], "-f") == 0) {
-	    formatFlag = TRUE;
+        }
+        else if (strcmp(argv[i], "-f") == 0)
+        {
+            formatFlag = TRUE;
 #endif
-        } else if (strcmp(argv[i], "-n") == 0) {
-            ASSERT(i + 1 < argc);   // next argument is float
+        }
+        else if (strcmp(argv[i], "-n") == 0)
+        {
+            ASSERT(i + 1 < argc); // next argument is float
             reliability = atof(argv[i + 1]);
             i++;
-        } else if (strcmp(argv[i], "-m") == 0) {
-            ASSERT(i + 1 < argc);   // next argument is int
+        }
+        else if (strcmp(argv[i], "-m") == 0)
+        {
+            ASSERT(i + 1 < argc); // next argument is int
             hostName = atoi(argv[i + 1]);
             i++;
-        } else if (strcmp(argv[i], "-u") == 0) {
+        }
+        else if(strcmp(argv[i], "-quantum") == 0)
+        {
+            ASSERT(i + 1 < argc); // next argument is int
+            quantum = atoi(argv[i + 1]);
+            i++;
+        }
+        else if (strcmp(argv[i], "-u") == 0)
+        {
             cout << "Partial usage: nachos [-rs randomSeed]\n";
-	    cout << "Partial usage: nachos [-s]\n";
+            cout << "Partial usage: nachos [-s]\n";
             cout << "Partial usage: nachos [-ci consoleIn] [-co consoleOut]\n";
 #ifndef FILESYS_STUB
-	    cout << "Partial usage: nachos [-nf]\n";
+            cout << "Partial usage: nachos [-nf]\n";
 #endif
             cout << "Partial usage: nachos [-n #] [-m #]\n";
-	}
+        }
     }
 }
 
@@ -106,8 +129,13 @@ Kernel::Initialize()
 #else
     fileSystem = new FileSystem(formatFlag);
 #endif // FILESYS_STUB
+    waitingList = new ThreadWaitingList;
     postOfficeIn = new PostOfficeInput(10);
     postOfficeOut = new PostOfficeOutput(reliability);
+    // phyPageList = new std::map<int, AddrSpace*>;
+    memMap = new Bitmap(NumPhysPages);
+    swapdisk = new SwapDisk();
+    bzero(&kernel->machine->mainMemory[0], MemorySize); // zero all  main memory
 
     interrupt->Enable();
 }
@@ -130,6 +158,7 @@ Kernel::~Kernel()
     delete fileSystem;
     delete postOfficeIn;
     delete postOfficeOut;
+    delete swapdisk;
     
     Exit(0);
 }
@@ -242,3 +271,40 @@ Kernel::NetworkTest() {
     // Then we're done!
 }
 
+
+bool Kernel::AllocateMem(OpenFile *file, int numBytes, int position, std::list<int> &dest_addrs)
+{
+    int fileLength = file->Length();
+    int firstPage, lastPage, numPages;
+    // char *buf;
+
+    if ((numBytes <= 0) || (position >= fileLength))
+        return false; // check request
+    if ((position + numBytes) > fileLength)
+        numBytes = fileLength - position;
+
+    firstPage = divRoundDown(position, PageSize);
+    lastPage = divRoundDown(position + numBytes - 1, PageSize);
+    numPages = 1 + lastPage - firstPage;
+
+    int current = position;
+    for (int i = 0; i < numPages; i++)
+    {
+        int target = dest_addrs.front();
+        dest_addrs.pop_front();
+        // this->WriteAt(target, tmp.substr(i * PageSize, PageSize)); // write one page a time
+        file->ReadAt(&(kernel->machine->mainMemory[target*PageSize]), PageSize, current);
+        current += PageSize;
+    }
+    // char* buf = new char[numPages*PageSize];
+    // bzero(buf, numPages*PageSize);
+    // file->ReadAt(&buf[0], numBytes, position);
+    // for(int i = 0; i < numPages; i++)
+    // {
+    //     int target = dest_addrs.front();
+    //     dest_addrs.pop_front();
+    //     bcopy(&buf[0], &kernel->machine->mainMemory[target*PageSize], PageSize);
+    // }
+
+    return true;
+}

@@ -200,7 +200,7 @@ DEFINES =  -DFILESYS_STUB -DRDATA -DSIM_FIX
 # break the thread system.  You might want to use -fno-inline if
 # you need to call some inline functions from the debugger.
 
-CFLAGS = -g -Wall $(INCPATH) $(DEFINES) $(HOSTCFLAGS) -DCHANGED -m32
+CFLAGS = -g -Wall $(INCPATH) $(DEFINES) $(HOSTCFLAGS) -DCHANGED -m32 -std=c++11
 LDFLAGS = -m32
 CPP_AS_FLAGS= -m32
 
@@ -270,7 +270,9 @@ THREAD_H = ../threads/alarm.h\
 	../threads/switch.h\
 	../threads/synch.h\
 	../threads/synchlist.h\
-	../threads/thread.h
+	../threads/thread.h\
+	../threads/threadlist.h\
+	../threads/swapdisk.h
 
 THREAD_C = ../threads/alarm.cc\
 	../threads/kernel.cc\
@@ -279,9 +281,11 @@ THREAD_C = ../threads/alarm.cc\
 	../threads/synch.cc\
 	../threads/synchlist.cc\
 	../threads/thread.cc\
+	../threads/threadlist.cc\
+	../threads/swapdisk.cc\
 	../threads/threadtest.cc
 
-THREAD_O = alarm.o kernel.o main.o scheduler.o synch.o thread.o threadtest.o
+THREAD_O = alarm.o kernel.o main.o scheduler.o synch.o thread.o threadlist.o swapdisk.o threadtest.o 
 
 USERPROG_H = ../userprog/addrspace.h\
 	../userprog/syscall.h\
@@ -342,7 +346,7 @@ switch.o: ../threads/switch.S
 	$(CC) $(CPP_AS_FLAGS) -P $(INCPATH) $(HOSTCFLAGS) -c ../threads/switch.S
 
 depend: $(CFILES) $(HFILES)
-	$(CC) $(INCPATH) $(DEFINES) $(HOSTCFLAGS) -DCHANGED -M $(CFILES) > makedep
+	$(CC) $(INCPATH) $(DEFINES) $(HOSTCFLAGS) -DCHANGED -std=c++11 -M $(CFILES) > makedep
 	@echo '/^# DO NOT DELETE THIS LINE/+1,$$d' >eddep
 	@echo '$$r makedep' >>eddep
 	@echo 'w' >>eddep

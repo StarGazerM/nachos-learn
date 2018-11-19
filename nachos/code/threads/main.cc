@@ -155,12 +155,28 @@ Print(char *name)
 
 void
 RunUserProg(void *filename) {
+    // printf("user program : %s is running >>>>>>>>>>>>>>>>\n", filename);
     AddrSpace *space = new AddrSpace;
+    // kernel->currentThread->space = space;
     ASSERT(space != (AddrSpace *)NULL);
     if (space->Load((char*)filename)) {  // load the program into the space
         space->Execute();         // run the program
     }
     ASSERTNOTREACHED();
+}
+
+void RunMultiUserProg(List<char*> *list)
+{
+    kernel->interrupt->SetLevel(IntOff);
+    ListIterator<char*> it(list);
+    while(!it.IsDone())
+    {
+        Thread* newUserThread = new Thread(it.Item());
+        newUserThread->Fork((VoidFunctionPtr)RunUserProg, (void *)it.Item());
+        kernel->interrupt->SetLevel(IntOff);
+        it.Next();
+    }
+    kernel->interrupt->SetLevel(IntOn);
 }
 
 //----------------------------------------------------------------------
@@ -183,6 +199,8 @@ main(int argc, char **argv)
     int i;
     char *debugArg = "";
     char *userProgName = NULL;        // default is not to execute a user prog
+    List<char*> *userprogList = new List<char*>;     // the userpog name need to be run
+
     bool threadTestFlag = false;
     bool consoleTestFlag = false;
     bool networkTestFlag = false;
@@ -210,6 +228,7 @@ main(int argc, char **argv)
 	else if (strcmp(argv[i], "-x") == 0) {
 	    ASSERT(i + 1 < argc);
 	    userProgName = argv[i + 1];
+        userprogList->Append(argv[i+1]);
 	    i++;
 	}
 	else if (strcmp(argv[i], "-K") == 0) {
@@ -299,8 +318,12 @@ main(int argc, char **argv)
 #endif // FILESYS_STUB
 
     // finally, run an initial user program if requested to do so
-    if (userProgName != NULL) {
-      RunUserProg(userProgName);
+    // if (userProgName != NULL) {
+    //   RunUserProg(userProgName);
+    // }
+    if (!userprogList->IsEmpty())
+    {
+        RunMultiUserProg(userprogList);
     }
 
     // NOTE: if the procedure "main" returns, then the program "nachos"

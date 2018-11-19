@@ -112,7 +112,7 @@ ifeq ($(hosttype),unknown)
 PROGRAMS = unknownhost
 else
 # change this if you create a new test program!
-PROGRAMS = add halt shell matmult sort segments
+PROGRAMS = add halt shell matmult sort segments prog1 prog2 prog3 mprog1 mprog2
 endif
 
 all: $(PROGRAMS)
@@ -156,6 +156,36 @@ matmult.o: matmult.c
 matmult: matmult.o start.o
 	$(LD) $(LDFLAGS) start.o matmult.o -o matmult.coff
 	$(COFF2NOFF) matmult.coff matmult
+
+prog1.o: prog1.c
+	$(CC) $(CFLAGS) -c prog1.c
+prog1: prog1.o start.o
+	$(LD) $(LDFLAGS) start.o prog1.o -o prog1.coff
+	$(COFF2NOFF) prog1.coff prog1
+
+prog2.o: prog2.c
+	$(CC) $(CFLAGS) -c prog2.c
+prog2: prog2.o start.o
+	$(LD) $(LDFLAGS) start.o prog2.o -o prog2.coff
+	$(COFF2NOFF) prog2.coff prog2
+
+prog3.o: prog3.c
+	$(CC) $(CFLAGS) -c prog3.c
+prog3: prog3.o start.o
+	$(LD) $(LDFLAGS) start.o prog3.o -o prog3.coff
+	$(COFF2NOFF) prog3.coff prog3
+
+mprog1.o: mprog1.c
+	$(CC) $(CFLAGS) -c mprog1.c
+mprog1: mprog1.o start.o
+	$(LD) $(LDFLAGS) start.o mprog1.o -o mprog1.coff
+	$(COFF2NOFF) mprog1.coff mprog1
+
+mprog2.o: mprog2.c
+	$(CC) $(CFLAGS) -c mprog2.c
+mprog2: mprog2.o start.o
+	$(LD) $(LDFLAGS) start.o mprog2.o -o mprog2.coff
+	$(COFF2NOFF) mprog2.coff mprog2
 
 clean:
 	$(RM) -f *.o *.ii

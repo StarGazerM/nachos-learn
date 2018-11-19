@@ -24,43 +24,57 @@
 #include "utility.h"
 #include "sysdep.h"
 
+class FileHeader;
 #ifdef FILESYS_STUB			// Temporarily implement calls to 
 					// Nachos file system as calls to UNIX!
 					// See definitions listed under #else
-class OpenFile {
-  public:
-    OpenFile(int f) { file = f; currentOffset = 0; }	// open the file
-    ~OpenFile() { Close(file); }			// close the file
+class OpenFile
+{
+public:
+	OpenFile(int f)
+	{
+		file = f;
+		currentOffset = 0;
+	}														 // open the file
+	~OpenFile() { Close(file); } // close the file
 
-    int ReadAt(char *into, int numBytes, int position) { 
-    		Lseek(file, position, 0); 
-		return ReadPartial(file, into, numBytes); 
-		}	
-    int WriteAt(char *from, int numBytes, int position) { 
-    		Lseek(file, position, 0); 
-		WriteFile(file, from, numBytes); 
+	int ReadAt(char *into, int numBytes, int position)
+	{
+		Lseek(file, position, 0);
+		return ReadPartial(file, into, numBytes);
+	}
+	int WriteAt(char *from, int numBytes, int position)
+	{
+		Lseek(file, position, 0);
+		WriteFile(file, from, numBytes);
 		return numBytes;
-		}	
-    int Read(char *into, int numBytes) {
-		int numRead = ReadAt(into, numBytes, currentOffset); 
+	}
+	int Read(char *into, int numBytes)
+	{
+		int numRead = ReadAt(into, numBytes, currentOffset);
 		currentOffset += numRead;
 		return numRead;
-    		}
-    int Write(char *from, int numBytes) {
-		int numWritten = WriteAt(from, numBytes, currentOffset); 
+	}
+	int Write(char *from, int numBytes)
+	{
+		int numWritten = WriteAt(from, numBytes, currentOffset);
 		currentOffset += numWritten;
 		return numWritten;
-		}
+	}
 
-    int Length() { Lseek(file, 0, 2); return Tell(file); }
-    
-  private:
-    int file;
-    int currentOffset;
+	int Length()
+	{
+		Lseek(file, 0, 2);
+		return Tell(file);
+	}
+	// FileHeader* GetHeader() { return NULL; };
+
+private:
+	int file;
+	int currentOffset;
 };
 
 #else // FILESYS
-class FileHeader;
 
 class OpenFile {
   public:
@@ -86,6 +100,7 @@ class OpenFile {
 					// file (this interface is simpler 
 					// than the UNIX idiom -- lseek to 
 					// end of file, tell, lseek back 
+		FileHeader* GetHeader() { return hdr;};
     
   private:
     FileHeader *hdr;			// Header for this file 

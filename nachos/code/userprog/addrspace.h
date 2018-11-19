@@ -34,6 +34,12 @@ class AddrSpace {
     void SaveState();			// Save/restore address space-specific
     void RestoreState();		// info on a context switch 
 
+    bool ModifyPTE(int phyNum, int vNum);     // modify a page table entry in this PCB
+                                              // when page fault happen, some entry may
+                                              // be swapped.
+    bool SwitchPTE(int pn1, int pn2);         // switch two virtual page's phycial pagen
+                                              // in one pcb
+
     // Translate virtual address _vaddr_
     // to physical address _paddr_. _mode_
     // is 0 for Read, 1 for Write.
@@ -48,6 +54,7 @@ class AddrSpace {
     void InitRegisters();		// Initialize user-level CPU registers,
 					// before jumping to user code
 
+    static int mark;
 };
 
 #endif // ADDRSPACE_H

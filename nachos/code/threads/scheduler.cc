@@ -177,3 +177,27 @@ Scheduler::Print()
     cout << "Ready list contents:\n";
     readyList->Apply(ThreadPrint);
 }
+
+
+//----------------------------------------------------------------------
+// Scheduler::CheckThreadAlive
+// 	check whether a thread is still alive, which means whether it is
+//	the ready list. 
+//----------------------------------------------------------------------
+bool
+Scheduler::CheckThreadAlive(int tid)
+{
+    IntStatus oldlevel = kernel->interrupt->SetLevel(IntOff);
+    ListIterator<Thread*> it(readyList);
+    while(!it.IsDone())
+    {
+        Thread *tmp = it.Item();
+        if(tmp->GetPid() == tid)
+        {
+            return true;
+        }
+        it.Next();
+    }
+    kernel->interrupt->SetLevel(oldlevel);
+    return false;
+}

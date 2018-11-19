@@ -33,6 +33,8 @@ const int STACK_FENCEPOST = 0xdedbeef;
 //	"threadName" is an arbitrary string, useful for debugging.
 //----------------------------------------------------------------------
 
+int Thread::counter = 0;
+
 Thread::Thread(char* threadName)
 {
     name = threadName;
@@ -45,6 +47,7 @@ Thread::Thread(char* threadName)
 					// of machine registers
     }
     space = NULL;
+    id = counter++;
 }
 
 //----------------------------------------------------------------------
@@ -173,7 +176,28 @@ Thread::Finish ()
 {
     (void) kernel->interrupt->SetLevel(IntOff);		
     ASSERT(this == kernel->currentThread);
-    
+
+    // when a thread is finished, it's page should be restored
+
+    auto it = kernel->phyPageList.begin();
+    if (kernel->phyPageList.size() > 0)
+    {
+        while (it != kernel->phyPageList.end())
+        {
+            // auto tmp = it;
+            // find page belong to this thread
+            if ((*it).second == this->space)
+            {
+                kernel->memMap->Clear((*it).first);
+                it = kernel->phyPageList.erase(it);
+            }
+            else
+            {
+                it++;
+            }
+        }
+    }
+
     DEBUG(dbgThread, "Finishing thread: " << name);
     
     Sleep(TRUE);				// invokes SWITCH

@@ -23,6 +23,7 @@
 Alarm::Alarm(bool doRandom)
 {
     timer = new Timer(doRandom, this);
+    counter = 0;
 }
 
 //----------------------------------------------------------------------
@@ -49,6 +50,15 @@ Alarm::CallBack()
     Interrupt *interrupt = kernel->interrupt;
     MachineStatus status = interrupt->getStatus();
     
+    if (counter < kernel->quantum)
+    {
+        counter++;
+        return;
+    }
+    else
+    {
+        counter = 0;
+    }
     if (status != IdleMode) {
 	interrupt->YieldOnReturn();
     }

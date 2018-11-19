@@ -34,6 +34,7 @@ class Alarm : public CallBackObj {
 
   private:
     Timer *timer;		// the hardware timer device
+    int counter;
 
     void CallBack();		// called when the hardware
 				// timer generates an interrupt

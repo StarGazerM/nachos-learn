@@ -177,6 +177,24 @@ ThreadJoin:
 	syscall
 	j 	$31
 	.end ThreadJoin
+
+	.global Fork_POS
+	.ent 	 Fork_POS
+Fork_POS:
+	addiu $2, $0, SC_Fork_POS
+	syscall
+	j 	$31
+	.end Fork_POS
+
+	.global Wait_POS
+	.ent 	 Wait_POS
+Wait_POS:
+	addiu $2, $0, SC_Wait_POS
+	syscall
+	j 	$31
+	.end Wait_POS
+
+
 	
 /* dummy function to keep gcc happy */
         .globl  __main

@@ -18,6 +18,12 @@
 #include "alarm.h"
 #include "filesys.h"
 #include "machine.h"
+#include "threadlist.h"
+#include "swapdisk.h"
+#include <utility>
+
+// #include <unordered_map>
+
 
 class PostOfficeInput;
 class PostOfficeOutput;
@@ -34,6 +40,8 @@ class Kernel {
     void Initialize(); 		// initialize the kernel -- separated
 				// from constructor because 
 				// refers to "kernel" as a global
+
+    bool AllocateMem(OpenFile *file, int numBytes, int position, std::list<int> &dest_addrs);
 
     void ThreadSelfTest();	// self test of threads and synchronization
 
@@ -53,11 +61,18 @@ class Kernel {
     SynchConsoleInput *synchConsoleIn;
     SynchConsoleOutput *synchConsoleOut;
     SynchDisk *synchDisk;
-    FileSystem *fileSystem;     
+    FileSystem *fileSystem;
+    ThreadWaitingList *waitingList;     
     PostOfficeInput *postOfficeIn;
     PostOfficeOutput *postOfficeOut;
+    list<pair<int, AddrSpace*>> phyPageList;    // keep track of the page in use, the key is page number 
+                                               // value is the pcb who own this page, current it is using 
+                                               // a FIFO update strategy.(support FIFO replace algorithm) 
+    Bitmap *memMap;         // a bitmap to check the usage of memory
+    SwapDisk *swapdisk;     // swap file ADT
 
     int hostName;               // machine identifier
+    int quantum;                // time quantum size
 
   private:
     bool randomSlice;		// enable pseudo-random time slicing

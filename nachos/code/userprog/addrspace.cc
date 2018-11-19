@@ -20,6 +20,9 @@
 #include "addrspace.h"
 #include "machine.h"
 #include "noff.h"
+// #include <list>
+
+int AddrSpace::mark = 0;
 
 //----------------------------------------------------------------------
 // SwapHeader
@@ -67,18 +70,6 @@ SwapHeader (NoffHeader *noffH)
 
 AddrSpace::AddrSpace()
 {
-    pageTable = new TranslationEntry[NumPhysPages];
-    for (int i = 0; i < NumPhysPages; i++) {
-	pageTable[i].virtualPage = i;	// for now, virt page # = phys page #
-	pageTable[i].physicalPage = i;
-	pageTable[i].valid = TRUE;
-	pageTable[i].use = FALSE;
-	pageTable[i].dirty = FALSE;
-	pageTable[i].readOnly = FALSE;  
-    }
-    
-    // zero out the entire address space
-    bzero(kernel->machine->mainMemory, MemorySize);
 }
 
 //----------------------------------------------------------------------
@@ -103,74 +94,179 @@ AddrSpace::~AddrSpace()
 //----------------------------------------------------------------------
 
 bool 
-AddrSpace::Load(char *fileName) 
+AddrSpace::Load(char *fileName)
 {
+    IntStatus old = kernel->interrupt->SetLevel(IntOff);
+    int prevMemUsed = PageSize - kernel->memMap->NumClear();
     OpenFile *executable = kernel->fileSystem->Open(fileName);
     NoffHeader noffH;
     unsigned int size;
 
-    if (executable == NULL) {
-	cerr << "Unable to open file " << fileName << "\n";
-	return FALSE;
+    if (executable == NULL)
+    {
+        cerr << "Unable to open file " << fileName << "\n";
+        return FALSE;
     }
 
     executable->ReadAt((char *)&noffH, sizeof(noffH), 0);
-    if ((noffH.noffMagic != NOFFMAGIC) && 
-		(WordToHost(noffH.noffMagic) == NOFFMAGIC))
-    	SwapHeader(&noffH);
+    if ((noffH.noffMagic != NOFFMAGIC) &&
+        (WordToHost(noffH.noffMagic) == NOFFMAGIC))
+        SwapHeader(&noffH);
     ASSERT(noffH.noffMagic == NOFFMAGIC);
 
 #ifdef RDATA
-// how big is address space?
+    // how big is address space?
     size = noffH.code.size + noffH.readonlyData.size + noffH.initData.size +
-           noffH.uninitData.size + UserStackSize;	
-                                                // we need to increase the size
-						// to leave room for the stack
+           noffH.uninitData.size + UserStackSize;
+    // we need to increase the size
+    // to leave room for the stack
 #else
-// how big is address space?
-    size = noffH.code.size + noffH.initData.size + noffH.uninitData.size 
-			+ UserStackSize;	// we need to increase the size
-						// to leave room for the stack
+    // how big is address space?
+    size = noffH.code.size + noffH.initData.size + noffH.uninitData.size + UserStackSize; // we need to increase the size
+                                                                                          // to leave room for the stack
 #endif
     numPages = divRoundUp(size, PageSize);
     size = numPages * PageSize;
 
-    ASSERT(numPages <= NumPhysPages);		// check we're not trying
-						// to run anything too big --
-						// at least until we have
-						// virtual memory
-
     DEBUG(dbgAddr, "Initializing address space: " << numPages << ", " << size);
 
-// then, copy in the code and data segments into memory
-// Note: this code assumes that virtual address = physical address
-    if (noffH.code.size > 0) {
-        DEBUG(dbgAddr, "Initializing code segment.");
-	DEBUG(dbgAddr, noffH.code.virtualAddr << ", " << noffH.code.size);
-        executable->ReadAt(
-		&(kernel->machine->mainMemory[noffH.code.virtualAddr]), 
-			noffH.code.size, noffH.code.inFileAddr);
+    pageTable = new TranslationEntry[numPages];
+    std::list<int> pageInSwap; // page needed to be allocated in Swap
+    std::list<int> pageInMem;  // page needed to be allocated in MainMem
+    for (int i = 0; i < numPages; i++)
+    {
+        pageTable[i].virtualPage = i;        // for now, it is contigues page allocation
+        if (kernel->memMap->NumClear() == 0) // if main memory is full, the address is on swap
+        {
+            std::string zero = "";
+            for (int i = 0; i < PageSize; i++)
+            {
+                zero += '\0';
+            }
+            int swapaddr = kernel->swapdisk->AllocatePage(zero);
+            ASSERT(swapaddr != -1)
+            pageTable[i].physicalPage = swapaddr;
+            pageTable[i].valid = FALSE; // swap is not in main memory, it is
+                                        // invalid !!!!
+            pageInSwap.push_back(swapaddr);
+        }
+        else
+        {
+            int memaddr = kernel->memMap->FindAndSet();
+            pageTable[i].physicalPage = memaddr;
+            pageTable[i].valid = TRUE;
+            pageInMem.push_back(memaddr);
+            kernel->phyPageList.push_back(make_pair(memaddr, this)); // put it in in-use-page list
+        }
+        pageTable[i].use = FALSE;
+        pageTable[i].dirty = FALSE;
+        pageTable[i].readOnly = FALSE;
     }
-    if (noffH.initData.size > 0) {
+    bool flag = false;
+    if(pageInSwap.size() > 0)
+        flag = true;
+    int current = prevMemUsed * PageSize; // counter
+
+    // then, copy in the code and data segments into memory
+    // Note: this code assumes that virtual address = physical address
+    if (noffH.code.size > 0)
+    {
+        DEBUG(dbgAddr, "Initializing code segment.");
+        DEBUG(dbgAddr, noffH.code.virtualAddr << ", " << noffH.code.size);
+        if (noffH.code.size + current < MemorySize) // check whether all page in memory
+        {
+            kernel->AllocateMem(executable, noffH.code.size, noffH.code.inFileAddr, pageInMem);
+        }
+        else // some thing allocated in swap~
+        {
+            int inMemSize = MemorySize - current;
+            int inSwapSize = noffH.code.size + current - MemorySize;
+            if (inMemSize > 0)
+            {
+                kernel->AllocateMem(executable, inMemSize, noffH.code.inFileAddr, pageInMem);
+            }
+            kernel->swapdisk->CopyFromFile(executable, inSwapSize, noffH.code.inFileAddr + inMemSize, pageInSwap);
+        }
+        current += noffH.code.size;
+    }
+    if (noffH.initData.size > 0)
+    {
         DEBUG(dbgAddr, "Initializing data segment.");
-	DEBUG(dbgAddr, noffH.initData.virtualAddr << ", " << noffH.initData.size);
-        executable->ReadAt(
-		&(kernel->machine->mainMemory[noffH.initData.virtualAddr]),
-			noffH.initData.size, noffH.initData.inFileAddr);
+        DEBUG(dbgAddr, noffH.initData.virtualAddr << ", " << noffH.initData.size);
+        if (noffH.initData.size + current < MemorySize) // check whether all page in memory
+        {
+            kernel->AllocateMem(executable, noffH.initData.size, noffH.initData.inFileAddr, pageInMem);
+        }
+        else // some thing allocated in swap~
+        {
+            int inMemSize = MemorySize - current;
+            int inSwapSize = noffH.initData.size + current - MemorySize;
+            if (inMemSize > 0)
+            {
+                kernel->AllocateMem(executable, inMemSize, noffH.initData.inFileAddr, pageInMem);
+            }
+            kernel->swapdisk->CopyFromFile(executable, inSwapSize, noffH.initData.inFileAddr + inMemSize, pageInSwap);
+        }
+        current += noffH.initData.size;
     }
 
 #ifdef RDATA
-    if (noffH.readonlyData.size > 0) {
+    if (noffH.readonlyData.size > 0)
+    {
         DEBUG(dbgAddr, "Initializing read only data segment.");
-	DEBUG(dbgAddr, noffH.readonlyData.virtualAddr << ", " << noffH.readonlyData.size);
-        executable->ReadAt(
-		&(kernel->machine->mainMemory[noffH.readonlyData.virtualAddr]),
-			noffH.readonlyData.size, noffH.readonlyData.inFileAddr);
+        DEBUG(dbgAddr, noffH.readonlyData.virtualAddr << ", " << noffH.readonlyData.size);
+        if (noffH.readonlyData.size + current < MemorySize) // check whether all page in memory
+        {
+            kernel->AllocateMem(executable, noffH.readonlyData.size, noffH.readonlyData.inFileAddr, pageInMem);
+        }
+        else // some thing allocated in swap~
+        {
+            int inMemSize = MemorySize - current;
+            int inSwapSize = noffH.readonlyData.size + current - MemorySize;
+            if (inMemSize > 0)
+            {
+                kernel->AllocateMem(executable, inMemSize, noffH.readonlyData.inFileAddr, pageInMem);
+            }
+            kernel->swapdisk->CopyFromFile(executable, inSwapSize, noffH.readonlyData.inFileAddr + inMemSize, pageInSwap);
+        }
+        current += noffH.readonlyData.size;
     }
 #endif
 
-    delete executable;			// close file
-    return TRUE;			// success
+    // zero out the page allocated in swap !
+    // if (pageInSwap.size() > 0)
+    // {
+    //     auto it = pageInSwap.begin();
+    //     while (it != pageInSwap.end())
+    //     {
+    //         std::string zero = "";
+    //         for (int i = 0; i < PageSize; i++)
+    //         {
+    //             zero += '\0';
+    //         }
+    //         kernel->swapdisk->WriteAt((*it), zero);
+    //         it++;
+    //     }
+    // }
+
+    // ASSERT(pageInMem.size() == 0)
+    ///////////////
+    if (flag)
+    {
+        // cout << "Main mem is \n";
+        // for (int i = 0; i < MemorySize; i++)
+        // {
+        //     cout << (int)kernel->machine->mainMemory[i] << "-";
+        // }
+        // cout << "\n";
+        // kernel->swapdisk->Flush();
+    }
+    ///////////////
+    kernel->interrupt->SetLevel(old);
+    mark += numPages;
+    delete executable; // close file
+    return TRUE;       // success
+
 }
 
 //----------------------------------------------------------------------
@@ -291,7 +387,7 @@ AddrSpace::Translate(unsigned int vaddr, unsigned int *paddr, int isReadWrite)
 
     // if the pageFrame is too big, there is something really wrong!
     // An invalid translation was loaded into the page table or TLB.
-    if (pfn >= NumPhysPages) {
+    if (pfn >= NumPhysPages + SwapSize) {
         DEBUG(dbgAddr, "Illegal physical page " << pfn);
         return BusErrorException;
     }
@@ -301,9 +397,9 @@ AddrSpace::Translate(unsigned int vaddr, unsigned int *paddr, int isReadWrite)
     if(isReadWrite)
         pte->dirty = TRUE;
 
-    *paddr = pfn*PageSize + offset;
+    *paddr = pfn;
 
-    ASSERT((*paddr < MemorySize));
+    // ASSERT((*paddr < MemorySize));
 
     //cerr << " -- AddrSpace::Translate(): vaddr: " << vaddr <<
     //  ", paddr: " << *paddr << "\n";
@@ -311,6 +407,50 @@ AddrSpace::Translate(unsigned int vaddr, unsigned int *paddr, int isReadWrite)
     return NoException;
 }
 
+// TODO: change param name!!!!!!!
+bool 
+AddrSpace::ModifyPTE(int phyNum, int vNum)
+{
+    for(int i=0; i < numPages; i++)
+    {
+        if(pageTable[i].physicalPage == phyNum)
+        {
+            pageTable[i].physicalPage = vNum;
+            if(vNum >= 128)
+            {
+                pageTable[i].valid = FALSE;
+            }
+            else
+            {
+                pageTable[i].valid = TRUE;
+            }
+            return true;
+        }
+    }
+    ASSERTNOTREACHED();
+}
 
-
-
+bool
+AddrSpace::SwitchPTE(int pnMem, int pnSwap)
+{
+    int flag = 0;
+    for(int i=0; i < numPages; i++)
+    {
+        if(pageTable[i].physicalPage == pnMem)
+        {
+            pageTable[i].physicalPage = pnSwap;
+            pageTable[i].valid = FALSE;
+            flag++;
+            continue;
+        }
+        if(pageTable[i].physicalPage == pnSwap)
+        {
+            pageTable[i].physicalPage = pnMem;
+            pageTable[i].valid = TRUE;
+            flag++;
+            continue;
+        }
+    }
+    ASSERT(flag == 2)
+    return true;
+}

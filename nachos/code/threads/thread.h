@@ -113,6 +113,8 @@ class Thread {
 				// (If NULL, don't deallocate stack)
     ThreadStatus status;	// ready, running or blocked
     char* name;
+    int id;       // the thread id work as pid;
+    static int counter;  // the counter used to generate pid;
 
     void StackAllocate(VoidFunctionPtr func, void *arg);
     				// Allocate a stack for thread.
@@ -127,6 +129,8 @@ class Thread {
   public:
     void SaveUserState();		// save user-level register state
     void RestoreUserState();		// restore user-level register state
+
+    int GetPid(){ return id; };
 
     AddrSpace *space;			// User code this thread is running.
 };

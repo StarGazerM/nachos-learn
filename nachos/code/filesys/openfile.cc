@@ -193,4 +193,9 @@ OpenFile::Length()
     return hdr->FileLength(); 
 }
 
+// FileHeader* OpenFile::GetHeader()
+// {
+//     return hdr;
+// }
+
 #endif //FILESYS_STUB

@@ -36,6 +36,9 @@
 #define SC_ThreadJoin   15
 
 #define SC_Add		42
+#define SC_Fork_POS 43
+#define SC_Wait_POS 44
+#define SC_Exit_POS 45
 
 #ifndef IN_ASM
 
@@ -173,6 +176,15 @@ int ThreadJoin(ThreadId id);
  * Deletes current thread and returns ExitCode to every waiting lokal thread.
  */
 void ThreadExit(int ExitCode);	
+
+/*
+* execute a test thread function
+*/
+int Fork_POS(int i);
+
+// void Exit_POS();
+
+void Wait_POS(int child_id); 
 
 #endif /* IN_ASM */
 

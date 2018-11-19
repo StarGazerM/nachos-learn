@@ -10,10 +10,10 @@
 int
 main()
 {
-  int result;
+  //int result;
   
-  result = Add(42, 23);
-
+  // result = Add(42, 23);
+  Write("finish", 6, 1);
   Halt();
   /* not reached */
 }

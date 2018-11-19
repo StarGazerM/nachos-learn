@@ -53,7 +53,10 @@ enum ExceptionType { NoException,           // Everything ok!
 		     OverflowException,     // Integer overflow in add or sub.
 		     IllegalInstrException, // Unimplemented or reserved instr.
 		     
-		     NumExceptionTypes
+		     NumExceptionTypes,
+			 OutOfMemoryException,	// memmory is used up, it happened
+			 						// when allocate memory
+			 StackOverFlowException, 	// when stack boundry is touched
 };
 
 // User program CPU state.  The full set of MIPS registers, plus a few
