@@ -191,7 +191,7 @@
 # of "-DSIM_FIX" to the DEFINES.  This should be enabled by default
 # and eventually will not require the symbol definition
 ################################################################
-DEFINES =  -DFILESYS_STUB -DRDATA -DSIM_FIX
+DEFINES = -DRDATA -DSIM_FIX
 
 
 #####################################################################
@@ -200,7 +200,7 @@ DEFINES =  -DFILESYS_STUB -DRDATA -DSIM_FIX
 # break the thread system.  You might want to use -fno-inline if
 # you need to call some inline functions from the debugger.
 
-CFLAGS = -g -Wall $(INCPATH) $(DEFINES) $(HOSTCFLAGS) -DCHANGED -m32
+CFLAGS = -g -Wall $(INCPATH) $(DEFINES) $(HOSTCFLAGS) -DCHANGED -m32 -std=c++11
 LDFLAGS = -m32
 CPP_AS_FLAGS= -m32
 
@@ -342,7 +342,7 @@ switch.o: ../threads/switch.S
 	$(CC) $(CPP_AS_FLAGS) -P $(INCPATH) $(HOSTCFLAGS) -c ../threads/switch.S
 
 depend: $(CFILES) $(HFILES)
-	$(CC) $(INCPATH) $(DEFINES) $(HOSTCFLAGS) -DCHANGED -M $(CFILES) > makedep
+	$(CC) $(INCPATH) $(DEFINES) $(HOSTCFLAGS) -DCHANGED -std=c++11 -M $(CFILES) > makedep
 	@echo '/^# DO NOT DELETE THIS LINE/+1,$$d' >eddep
 	@echo '$$r makedep' >>eddep
 	@echo 'w' >>eddep

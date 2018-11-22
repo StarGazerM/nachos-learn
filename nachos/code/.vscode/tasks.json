@@ -1,0 +1,32 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build nachos",
+            "type": "shell",
+            "command": "cd build.linux&&make nachos"
+        },
+        {
+            "label": "clean nachos",
+            "type": "shell",
+            "command": "cd build.linux&&make clean"
+        },
+        {
+            "label": "build dep",
+            "type": "shell",
+            "command": "cd build.linux&&make distclean&&make depend"
+        },
+        {
+            "label": "usrprog",
+            "type": "shell",
+            "command": "cd test&&make"
+        },
+        {
+            "label": "clean usrprog",
+            "type": "shell",
+            "command": "cd test&&make clean&&make distclean"
+        }
+    ]
+}
