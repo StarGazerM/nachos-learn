@@ -32,7 +32,6 @@ Building and starting user-level programs in NachOS:
     - 3.2 原子读写操作，并保证读写一致性 **x**
     - 3.3 删除操作位于最低优先级，并发时先处理读写 **x**
 
-
 **test**
 1. 使文件系统支持 `128kb` 的文件
     - 1.1增加 indirect data block 支持 *(stargazermiao)* **x**
