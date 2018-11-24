@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build.linux/nachos",
-            "args": ["-K"],
+            "args": ["-f", "-K"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

@@ -34,12 +34,12 @@ Building and starting user-level programs in NachOS:
 
 **test**
 1. 使文件系统支持 `128kb` 的文件
-    - 1.1增加 indirect data block 支持 *(stargazermiao)* **x**
-    - 1.2增加 double indirect data block 支持 *(stargazermiao)* **x**
-    - 1.3修改 `FileHeader::Allocate`使其分配时能向indirect block 和 double indirect block 上分配 *(stargazermiao)* **x**
+    - 1.1增加 indirect data block 支持 *(stargazermiao)* **√**
+    - 1.2增加 double indirect data block 支持 *(stargazermiao)* **√**
+    - 1.3修改 `FileHeader::Allocate`使其分配时能向indirect block 和 double indirect block 上分配 *(stargazermiao)* **√**
     - 1.4修改 `FileHeader::Allocate`删除非直接的块 **x**
 2. 使文件系统支持自适应的文件大小
-    - 2.1修改`FileHeader::ByteToSector`访问大于文件1sector内容的块时增加新块 *(stargazermiao)* **x**
+    - 2.1修改`FileHeader::ByteToSector`访问大于文件1sector内容的块时增加新块 *(stargazermiao)* **√**
     - 2.2新增 `FileHeader::DeleteByte`删除文件中某一字节(~~不在明确题目要求中,不知道是不是强制要求，麻烦~~) **x**
     - 2.3处理创建新块/删除块过程中的磁盘freeMap并发访问问题 **x**
     - 2.4使文件夹支持超过10个文件 **x**

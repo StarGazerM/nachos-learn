@@ -55,12 +55,12 @@ IndirectHeader::WriteBack(int sector)
 }
 
 int 
-IndirectHeader::ByteToSector(int offset, PersistentBitmap &freeMap)
+IndirectHeader::ByteToSector(int offset, PersistentBitmap *freeMap)
 {
     if (dataSectors[offset] = -1)   // byte on new sector
     {
-        dataSectors[offset] = freeMap.FindAndSet();
-        freeMap.WriteBack(kernel->fileSystem->GetFreeMap());
+        dataSectors[offset] = freeMap->FindAndSet();
+        freeMap->WriteBack(kernel->fileSystem->GetFreeMap());
     }
     return dataSectors[offset];
 }
@@ -95,22 +95,34 @@ DoubleIndirectHeader::WriteBack(int sector)
 }
 
 int
-DoubleIndirectHeader::ByteToSector(int offset, PersistentBitmap &freeMap)
+DoubleIndirectHeader::ByteToSector(int offset, PersistentBitmap *freeMap)
 {
+    int ret;
     int indirectOff = offset / (NumData * SectorSize);
     int directOff = (offset % (NumData * SectorSize)) / SectorSize;
-    IndirectHeader idtmp;
+    IndirectHeader *idtmp = new IndirectHeader;
     if(dataHeaders[indirectOff] == -1)  // byte on new indirect node
     {
-        dataHeaders[indirectOff] = freeMap.FindAndSet();
-        idtmp.dataSectors[0] = freeMap.FindAndSet();
-        freeMap.WriteBack(kernel->fileSystem->GetFreeMap());
+        dataHeaders[indirectOff] = freeMap->FindAndSet();
+        idtmp->dataSectors[0] = freeMap->FindAndSet();
+        freeMap->WriteBack(kernel->fileSystem->GetFreeMap());
     }
     else
     {
-        kernel->synchDisk->ReadSector(dataHeaders[indirectOff], (char *)&idtmp);
+        kernel->synchDisk->ReadSector(dataHeaders[indirectOff], (char *)idtmp);
     }
-    return idtmp.ByteToSector(directOff, freeMap);
+    ret = idtmp->ByteToSector(directOff, freeMap);
+    delete idtmp;
+    return ret;
+}
+
+FileHeader::FileHeader()
+{
+    for(int i = 0; i < NumDirect; i++)
+        dataSectors[i] = -1;
+    for (int i=0; i < NumIndirect; i++)
+        indirects[i] = -1;
+    doubleIndirect = -1;
 }
 
 //----------------------------------------------------------------
@@ -135,43 +147,51 @@ FileHeader::initAllData(PersistentBitmap *freeMap, int num)
     // init indirect
     for(int i = 0; i < NumIndirect; i++)
     {
-        IndirectHeader newIndricts;
+        IndirectHeader *newIndricts = new IndirectHeader;
         // allocate a sector for poniter, in order to keep it it must be flushed
         // to disk @REFECTOR here
         indirects[i] = freeMap->FindAndSet();  
         for(int j = 0; j < NumData; j++)
         {
-            newIndricts.dataSectors[j] = freeMap->FindAndSet();
+            newIndricts->dataSectors[j] = freeMap->FindAndSet();
+            counter++;
             if(counter >= num)
             {
-                newIndricts.WriteBack(indirects[i]);
+                newIndricts->WriteBack(indirects[i]);
+                delete newIndricts;
                 return;
             }
         }
-        newIndricts.WriteBack(indirects[i]);
+        newIndricts->WriteBack(indirects[i]);
+        delete newIndricts;
     }
     // init double indirect
     doubleIndirect = freeMap->FindAndSet(); 
-    DoubleIndirectHeader newDoubleIndirectHeader;
+    DoubleIndirectHeader *newDoubleIndirectHeader = new DoubleIndirectHeader;
     for (int i = 0; i < NumData; i++)
     {
-        IndirectHeader newIndricts;
+        IndirectHeader *newIndricts = new IndirectHeader;
         // allocate a sector for poniter, in order to keep it it must be flushed
         // to disk @REFECTOR here
         indirects[i] = freeMap->FindAndSet();  
         for(int j = 0; j < NumData; j++)
         {
-            newIndricts.dataSectors[j] = freeMap->FindAndSet();
+            newIndricts->dataSectors[j] = freeMap->FindAndSet();
+            counter++;
             if(counter >= num)
             {
-                newIndricts.WriteBack(indirects[i]);
-                newDoubleIndirectHeader.WriteBack(doubleIndirect);
+                newIndricts->WriteBack(indirects[i]);
+                newDoubleIndirectHeader->WriteBack(doubleIndirect);
+                delete newIndricts;
+                delete newDoubleIndirectHeader;
                 return;
             }
         }
-        newIndricts.WriteBack(indirects[i]);
+        newIndricts->WriteBack(indirects[i]);
+        delete newIndricts;
     }
-    newDoubleIndirectHeader.WriteBack(doubleIndirect);
+    newDoubleIndirectHeader->WriteBack(doubleIndirect);
+    delete newDoubleIndirectHeader;
     return;
 }
 
@@ -285,20 +305,26 @@ FileHeader::WriteBack(int sector)
 int
 FileHeader::ByteToSector(int offset)
 {
-    ASSERT(offset < (numSectors + 1)*SectorSize)
+    int ret;
+    ASSERT(offset <= (numSectors + 1)*SectorSize)
     if(offset > numBytes)
     {
         numSectors++;
         numBytes += offset % SectorSize;
     }
-    PersistentBitmap freeMap(kernel->fileSystem->GetFreeMap(),numSectors);
+    else
+    {
+        return dataSectors[offset / SectorSize];
+    }
+    PersistentBitmap *freeMap = new PersistentBitmap(kernel->fileSystem->GetFreeMap(),NumSectors);
     if(offset < NumDirect*SectorSize)
     {
         if(dataSectors[offset / SectorSize] == -1)
         {
-            dataSectors[offset / SectorSize] = freeMap.FindAndSet();
-            freeMap.WriteBack(kernel->fileSystem->GetFreeMap());
+            dataSectors[offset / SectorSize] = freeMap->FindAndSet();
+            freeMap->WriteBack(kernel->fileSystem->GetFreeMap());
         }
+        delete freeMap;
         return(dataSectors[offset / SectorSize]);
     }
     int current = offset - NumDirect*SectorSize;
@@ -306,36 +332,45 @@ FileHeader::ByteToSector(int offset)
     {
         int indirectOff =  current / (NumData * SectorSize);
         // read that indirect node form disk
-        IndirectHeader idtmp;
+        IndirectHeader *idtmp = new IndirectHeader;
         if(indirects[indirectOff] == -1)    // new byte is append on a new indirect node
         {
-            indirects[indirectOff] = freeMap.FindAndSet();
-            idtmp.dataSectors[0] = freeMap.FindAndSet();
-            idtmp.WriteBack(indirects[indirectOff]);
-            freeMap.WriteBack(kernel->fileSystem->GetFreeMap());
+            indirects[indirectOff] = freeMap->FindAndSet();
+            idtmp->dataSectors[0] = freeMap->FindAndSet();
+            idtmp->WriteBack(indirects[indirectOff]);
+            freeMap->WriteBack(kernel->fileSystem->GetFreeMap());
+            delete idtmp;
+            delete freeMap;
         }
         else    // no data appended on indirect node
         {   
-            idtmp.FetchFrom(indirects[indirectOff]);
+            idtmp->FetchFrom(indirects[indirectOff]);
         }
         current = current % (NumData * SectorSize);
         int directOff = current / SectorSize;
-        return idtmp.ByteToSector(directOff, freeMap);
+        ret = idtmp->ByteToSector(directOff, freeMap);
+        delete idtmp;
+        delete freeMap;
+        return ret;
     }
     else
     {
         current = current - NumIndirect * NumData * SectorSize;
-        DoubleIndirectHeader dtmp;
+        DoubleIndirectHeader *dtmp = new DoubleIndirectHeader;
         if(doubleIndirect = -1) // on new  double indirect node
         {
-            doubleIndirect = freeMap.FindAndSet();
-            dtmp.dataHeaders[0] = freeMap.FindAndSet();
-            dtmp.WriteBack(doubleIndirect);
-            IndirectHeader idtmp;
-            idtmp.dataSectors[0] = freeMap.FindAndSet();
-            idtmp.WriteBack(dtmp.dataHeaders[0]);
-            freeMap.WriteBack(kernel->fileSystem->GetFreeMap());
-            return idtmp.dataSectors[0];
+            doubleIndirect = freeMap->FindAndSet();
+            dtmp->dataHeaders[0] = freeMap->FindAndSet();
+            dtmp->WriteBack(doubleIndirect);
+            IndirectHeader *idtmp = new IndirectHeader;
+            idtmp->dataSectors[0] = freeMap->FindAndSet();
+            idtmp->WriteBack(dtmp->dataHeaders[0]);
+            freeMap->WriteBack(kernel->fileSystem->GetFreeMap());
+            ret = idtmp->dataSectors[0];
+            delete dtmp;
+            delete idtmp;
+            delete freeMap;
+            return ret;
         }
         // kernel->synchDisk->ReadSector(doubleIndirect, (char*)&dtmp);
         // int indirectOff = current / (NumData * SectorSize);
@@ -343,7 +378,11 @@ FileHeader::ByteToSector(int offset)
         // kernel->synchDisk->ReadSector(dtmp.dataHeaders[indirectOff], (char*)&idtmp);
         // current = current % (NumData * SectorSize);
         // int directOff = current / SectorSize;
-        return dtmp.ByteToSector(current, freeMap);
+        
+        ret = dtmp->ByteToSector(current, freeMap);
+        delete dtmp;
+        delete freeMap;
+        return ret;
     }
 }
 
