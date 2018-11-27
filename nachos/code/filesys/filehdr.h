@@ -61,7 +61,7 @@ class IndirectHeader
     void Deallocate(PersistentBitmap *freeMap);
     void FetchFrom(int sectorNumber); 	
     void WriteBack(int sectorNumber); 	
-    int ByteToSector(int offset, PersistentBitmap &freeMap);
+    int ByteToSector(int offset, PersistentBitmap *freeMap);
 };
 
 // a block full of pointer to directs data block, whcih
@@ -78,7 +78,7 @@ class DoubleIndirectHeader
     void Deallocate(PersistentBitmap *freeMap);
     void FetchFrom(int sectorNumber); 	
     void WriteBack(int sectorNumber);
-    int ByteToSector(int offset, PersistentBitmap &freeMap);
+    int ByteToSector(int offset, PersistentBitmap *freeMap);
 };
 
 // // full of pointer to indirect datd block 
@@ -98,6 +98,7 @@ class DoubleIndirectHeader
 
 class FileHeader {
   public:
+    FileHeader();
     bool Allocate(PersistentBitmap *bitMap, int fileSize);// Initialize a file header, 
 						//  including allocating space 
 						//  on disk for the file data

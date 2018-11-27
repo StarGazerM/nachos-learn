@@ -144,13 +144,16 @@ OpenFile::ReadAt(char *into, int numBytes, int position)
 int
 OpenFile::WriteAt(char *from, int numBytes, int position)
 {
+    int realNumBytes = numBytes;
     int fileLength = hdr->FileLength();
     int i, firstSector, lastSector, numSectors;
     bool firstAligned, lastAligned;
     char *buf;
 
-    if ((numBytes <= 0) || (position >= fileLength))
-	return 0;				// check request
+    if(numBytes <= 0)
+        return 0;
+    if (numBytes <= 0)
+	    return 0;				// check request
     if ((position + numBytes) > fileLength)
 	numBytes = fileLength - position;
     DEBUG(dbgFile, "Writing " << numBytes << " bytes at " << position << " from file of length " << fileLength);
@@ -159,7 +162,7 @@ OpenFile::WriteAt(char *from, int numBytes, int position)
     lastSector = divRoundDown(position + numBytes - 1, SectorSize);
     numSectors = 1 + lastSector - firstSector;
 
-    buf = new char[numSectors * SectorSize];
+    buf = new char[(numSectors+1) * SectorSize];
 
     firstAligned = (position == (firstSector * SectorSize));
     lastAligned = ((position + numBytes) == ((lastSector + 1) * SectorSize));
@@ -172,12 +175,28 @@ OpenFile::WriteAt(char *from, int numBytes, int position)
 				SectorSize, lastSector * SectorSize);	
 
 // copy in the bytes we want to change 
-    bcopy(from, &buf[position - (firstSector * SectorSize)], numBytes);
 
+    if((position+realNumBytes) > fileLength)
+    {
+        ASSERT(position + numBytes < (numSectors+1) * PageSize)
+        lastSector++;
+        numBytes = realNumBytes;
+        fileLength += realNumBytes;
+    }
+
+    bcopy(from, &buf[position - (firstSector * SectorSize)], numBytes);
 // write modified sectors back
-    for (i = firstSector; i <= lastSector; i++)	
-        kernel->synchDisk->WriteSector(hdr->ByteToSector(i * SectorSize), 
-					&buf[(i - firstSector) * SectorSize]);
+    for (i = 0; i <= lastSector*SectorSize; i+=SectorSize)
+    {
+        int readp = i;
+        int writep = i;
+        if((i+SectorSize) > fileLength)
+        {
+            writep = fileLength;
+        }
+        kernel->synchDisk->WriteSector(hdr->ByteToSector(writep), 
+					&buf[readp]);
+    }
     delete [] buf;
     return numBytes;
 }
