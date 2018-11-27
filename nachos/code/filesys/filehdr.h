@@ -17,8 +17,11 @@
 #include "disk.h"
 #include "pbitmap.h"
 
-#define NumDirect 	((SectorSize - 2 * sizeof(int)) / sizeof(int))
-#define MaxFileSize 	(NumDirect * SectorSize)
+#define NumDoubleIndirect   1
+#define NumIndirect 9
+#define NumDirect 	((SectorSize - (2+10) * sizeof(int)) / sizeof(int))
+#define NumData     (SectorSize / sizeof(int))
+#define MaxFileSize 	1024 * SectorSize
 
 // The following class defines the Nachos "file header" (in UNIX terms,  
 // the "i-node"), describing where on disk to find all of the data in the file.
@@ -34,6 +37,64 @@
 // There is no constructor; rather the file header can be initialized
 // by allocating blocks for the file (if it is a new file), or by
 // reading it from disk.
+
+// in order to store a file larger than 4k bytes, I use a Indirect node
+// combine withs doublely direct node. which work as 3 layer data structure
+// which is similar to multi-path tree structure.
+// although one double node can satisfy the file large as whole disk
+// right now, in order to decrease the time expanse of find a block
+// direct access and one level access is still kept in current file header
+
+// work as direct data block
+class IndirectHeader
+{
+  public:
+    int dataSectors[NumData];
+    IndirectHeader()
+    {
+        for(int i = 0; i < NumData; i++)
+        {
+            dataSectors[i] = -1;
+        }
+    }
+
+    void Deallocate(PersistentBitmap *freeMap);
+    void FetchFrom(int sectorNumber); 	
+    void WriteBack(int sectorNumber); 	
+    int ByteToSector(int offset, PersistentBitmap &freeMap);
+};
+
+// a block full of pointer to directs data block, whcih
+// will cost one 
+class DoubleIndirectHeader
+{
+  public:
+    int dataHeaders[NumData];
+    DoubleIndirectHeader()
+    {
+        for(int i = 0; i < NumData; i++)
+            dataHeaders[i] = -1;
+    }
+    void Deallocate(PersistentBitmap *freeMap);
+    void FetchFrom(int sectorNumber); 	
+    void WriteBack(int sectorNumber);
+    int ByteToSector(int offset, PersistentBitmap &freeMap);
+};
+
+// // full of pointer to indirect datd block 
+// class DoubleIndirectHeader
+// {
+//   public:
+//     int indirectHeaders[NumData];
+//     DoubleIndirectHeader()
+//     {
+//         for(int i = 0; i < NumData; i++)
+//             indirectHeaders[0] = -1;
+//     }
+//     void Deallocate(PersistentBitmap *freeMap);
+//     // void FetchFrom(int sectorNumber); 	
+//     // void WriteBack(int sectorNumber);    
+// };
 
 class FileHeader {
   public:
@@ -61,6 +122,10 @@ class FileHeader {
     int numSectors;			// Number of data sectors in the file
     int dataSectors[NumDirect];		// Disk sector numbers for each data 
 					// block in the file
+    int indirects[NumIndirect];
+    int doubleIndirect;
+
+    void initAllData(PersistentBitmap *freeMap, int num);
 };
 
 #endif // FILEHDR_H
