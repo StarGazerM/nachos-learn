@@ -18,7 +18,7 @@
 #include "pbitmap.h"
 
 #define NumDoubleIndirect   1
-#define NumIndirect 9
+#define NumIndirect 8
 #define NumDirect 	((SectorSize - (2+10) * sizeof(int)) / sizeof(int))
 #define NumData     (SectorSize / sizeof(int))
 #define MaxFileSize 	1024 * SectorSize

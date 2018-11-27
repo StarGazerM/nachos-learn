@@ -19,9 +19,12 @@ SimpleThread(int which)
     if(kernel->fileSystem->Create("test2", 128))
     {
         OpenFile* test = kernel->fileSystem->Open("test2");
+
+        test->WriteAt("bbbb", 4, 0);
         test->WriteAt("aaaa", 4, 126);
         char tmp[10];
-        test->ReadAt(tmp, 4, 126);
+        
+        test->ReadAt(tmp, 4, 0);
         tmp[4] = '\0';
         cout << tmp << endl;
     }
