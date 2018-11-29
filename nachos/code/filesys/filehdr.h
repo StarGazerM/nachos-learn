@@ -21,6 +21,7 @@
 #define NumIndirect 9
 #define NumDirect 	((SectorSize - (2+10) * sizeof(int)) / sizeof(int))
 #define NumData     (SectorSize / sizeof(int))
+// Project requires the max file size is 128kb
 #define MaxFileSize 	1024 * SectorSize
 
 // The following class defines the Nachos "file header" (in UNIX terms,  

@@ -150,11 +150,13 @@ OpenFile::WriteAt(char *from, int numBytes, int position)
     bool firstAligned, lastAligned;
     char *buf;
 
-    if(numBytes <= 0)
-        return 0;
+    //if(numBytes <= 0)
+    //    return 0;
     if (numBytes <= 0)
 	    return 0;				// check request
     if ((position + numBytes) > fileLength)
+    // We don't want to change the original code
+    // Instead of remove the restriction, we use another 'dummy' variable called realNumBytes
 	numBytes = fileLength - position;
     DEBUG(dbgFile, "Writing " << numBytes << " bytes at " << position << " from file of length " << fileLength);
 
@@ -162,6 +164,7 @@ OpenFile::WriteAt(char *from, int numBytes, int position)
     lastSector = divRoundDown(position + numBytes - 1, SectorSize);
     numSectors = 1 + lastSector - firstSector;
 
+    // only allow add one more new sector
     buf = new char[(numSectors+1) * SectorSize];
 
     firstAligned = (position == (firstSector * SectorSize));
@@ -178,19 +181,24 @@ OpenFile::WriteAt(char *from, int numBytes, int position)
 
     if((position+realNumBytes) > fileLength)
     {
+        // numBytes has been modified, now we change it back
         ASSERT(position + numBytes < (numSectors+1) * PageSize)
         lastSector++;
         numBytes = realNumBytes;
-        fileLength += realNumBytes;
+        // update new file length
+        fileLength = position + realNumBytes;
     }
 
     bcopy(from, &buf[position - (firstSector * SectorSize)], numBytes);
 // write modified sectors back
+    // only copy the affected sectors back 
+    // Or i = 0?
     for (i = 0; i <= lastSector*SectorSize; i+=SectorSize)
     {
         int readp = i;
         int writep = i;
         if((i+SectorSize) > fileLength)
+            // this is the last sector
         {
             writep = fileLength;
         }
