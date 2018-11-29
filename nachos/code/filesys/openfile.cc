@@ -141,44 +141,47 @@ OpenFile::ReadAt(char *into, int numBytes, int position)
     return numBytes;
 }
 
+// Since original Nachos restricts file size into one sector, original WriteAt restrics file length.
+// Thus the numBytes could be updated to not exceed one sector.
+// We would like to change as little original code as possible, 
+// so we add a variable "realNumBytes" to store the value of "numBytes" input.
 int
 OpenFile::WriteAt(char *from, int numBytes, int position)
 {
     int realNumBytes = numBytes;
+    // Sounds ambigious variable, just used to keep the original input value.
+    // The reason refers to Line #164.
     int fileLength = hdr->FileLength();
     int i, firstSector, lastSector, numSectors;
     bool firstAligned, lastAligned;
     char *buf;
 
-    //if(numBytes <= 0)
-    //    return 0;
     if (numBytes <= 0)
 	    return 0;				// check request
     if ((position + numBytes) > fileLength)
     // We don't want to change the original code
-    // Instead of remove the restriction, we use another 'dummy' variable called realNumBytes
+    // Instead of remove the restriction, we use a dummy variable called realNumBytes to keep original value.
 	numBytes = fileLength - position;
     DEBUG(dbgFile, "Writing " << numBytes << " bytes at " << position << " from file of length " << fileLength);
 
     firstSector = divRoundDown(position, SectorSize);
     lastSector = divRoundDown(position + numBytes - 1, SectorSize);
     numSectors = 1 + lastSector - firstSector;
-
-    // only allow add one more new sector
+    
+    // Our design is to allow one more extra sector for write.
     buf = new char[(numSectors+1) * SectorSize];
 
     firstAligned = (position == (firstSector * SectorSize));
     lastAligned = ((position + numBytes) == ((lastSector + 1) * SectorSize));
 
-// read in first and last sector, if they are to be partially modified
+    // read in first and last sector, if they are to be partially modified
     if (!firstAligned)
         ReadAt(buf, SectorSize, firstSector * SectorSize);	
     if (!lastAligned && ((firstSector != lastSector) || firstAligned))
         ReadAt(&buf[(lastSector - firstSector) * SectorSize], 
 				SectorSize, lastSector * SectorSize);	
 
-// copy in the bytes we want to change 
-
+    // copy in the bytes we want to change 
     if((position+realNumBytes) > fileLength)
     {
         // numBytes has been modified, now we change it back
@@ -190,20 +193,23 @@ OpenFile::WriteAt(char *from, int numBytes, int position)
     }
 
     bcopy(from, &buf[position - (firstSector * SectorSize)], numBytes);
-// write modified sectors back
-    // only copy the affected sectors back 
-    // Or i = 0?
+
+    // The original Nachos will only write back the modified sector
+    // We changed the iteration style, because when writing back the last sector,
+    // the input of ByteToSector() needs to be the last byte of the file.
+    // And when writing the other sectors, the input of ByteToSector() is 0.
+    // SO we cannot stay on the original iteration style.
     for (i = 0; i <= lastSector*SectorSize; i+=SectorSize)
     {
-        int readp = i;
-        int writep = i;
+        int readPosition = i;
+        int writePosition = i;
         if((i+SectorSize) > fileLength)
-            // this is the last sector
+        // When writing back the last sector
         {
-            writep = fileLength;
+            writePosition = fileLength;
         }
-        kernel->synchDisk->WriteSector(hdr->ByteToSector(writep), 
-					&buf[readp]);
+        kernel->synchDisk->WriteSector(hdr->ByteToSector(writePosition), 
+					&buf[readPosition]);
     }
     delete [] buf;
     return numBytes;
