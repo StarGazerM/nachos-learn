@@ -643,8 +643,21 @@ interrupt.o: ../machine/interrupt.cc /usr/include/stdc-predef.h \
  ../machine/callback.h ../threads/main.h ../threads/kernel.h \
  ../threads/thread.h ../machine/machine.h ../machine/translate.h \
  ../userprog/addrspace.h ../filesys/filesys.h ../filesys/openfile.h \
- ../threads/scheduler.h ../machine/stats.h ../threads/alarm.h \
- ../machine/timer.h
+ ../filesys/filehdrmap.h /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../threads/scheduler.h ../machine/stats.h \
+ ../threads/alarm.h ../machine/timer.h
 stats.o: ../machine/stats.cc /usr/include/stdc-predef.h \
  ../lib/copyright.h ../lib/debug.h ../lib/utility.h ../lib/sysdep.h \
  /usr/include/c++/8.2.1/iostream \
@@ -888,8 +901,22 @@ timer.o: ../machine/timer.cc /usr/include/stdc-predef.h \
  /usr/include/string.h /usr/include/strings.h ../threads/kernel.h \
  ../threads/thread.h ../machine/machine.h ../machine/translate.h \
  ../userprog/addrspace.h ../filesys/filesys.h ../filesys/openfile.h \
- ../threads/scheduler.h ../lib/list.h ../lib/list.cc \
- ../machine/interrupt.h ../machine/stats.h ../threads/alarm.h
+ ../filesys/filehdrmap.h /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../threads/scheduler.h ../lib/list.h \
+ ../lib/list.cc ../machine/interrupt.h ../machine/stats.h \
+ ../threads/alarm.h
 console.o: ../machine/console.cc /usr/include/stdc-predef.h \
  ../lib/copyright.h ../machine/console.h ../lib/utility.h \
  ../machine/callback.h ../threads/main.h ../lib/debug.h ../lib/sysdep.h \
@@ -1013,9 +1040,22 @@ console.o: ../machine/console.cc /usr/include/stdc-predef.h \
  /usr/include/string.h /usr/include/strings.h ../threads/kernel.h \
  ../threads/thread.h ../machine/machine.h ../machine/translate.h \
  ../userprog/addrspace.h ../filesys/filesys.h ../filesys/openfile.h \
- ../threads/scheduler.h ../lib/list.h ../lib/list.cc \
- ../machine/interrupt.h ../machine/stats.h ../threads/alarm.h \
- ../machine/timer.h
+ ../filesys/filehdrmap.h /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../threads/scheduler.h ../lib/list.h \
+ ../lib/list.cc ../machine/interrupt.h ../machine/stats.h \
+ ../threads/alarm.h ../machine/timer.h
 machine.o: ../machine/machine.cc /usr/include/stdc-predef.h \
  ../lib/copyright.h ../machine/machine.h ../lib/utility.h \
  ../machine/translate.h ../threads/main.h ../lib/debug.h ../lib/sysdep.h \
@@ -1138,7 +1178,21 @@ machine.o: ../machine/machine.cc /usr/include/stdc-predef.h \
  /usr/include/c++/8.2.1/bits/istream.tcc /usr/include/c++/8.2.1/stdlib.h \
  /usr/include/string.h /usr/include/strings.h ../threads/kernel.h \
  ../threads/thread.h ../userprog/addrspace.h ../filesys/filesys.h \
- ../filesys/openfile.h ../threads/scheduler.h ../lib/list.h \
+ ../filesys/openfile.h ../filesys/filehdrmap.h \
+ /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../threads/scheduler.h ../lib/list.h \
  ../lib/list.cc ../machine/interrupt.h ../machine/callback.h \
  ../machine/stats.h ../threads/alarm.h ../machine/timer.h
 mipssim.o: ../machine/mipssim.cc /usr/include/stdc-predef.h \
@@ -1263,10 +1317,23 @@ mipssim.o: ../machine/mipssim.cc /usr/include/stdc-predef.h \
  /usr/include/string.h /usr/include/strings.h ../machine/machine.h \
  ../machine/translate.h ../machine/mipssim.h ../threads/main.h \
  ../threads/kernel.h ../threads/thread.h ../userprog/addrspace.h \
- ../filesys/filesys.h ../filesys/openfile.h ../threads/scheduler.h \
- ../lib/list.h ../lib/list.cc ../machine/interrupt.h \
- ../machine/callback.h ../machine/stats.h ../threads/alarm.h \
- ../machine/timer.h
+ ../filesys/filesys.h ../filesys/openfile.h ../filesys/filehdrmap.h \
+ /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../threads/scheduler.h ../lib/list.h \
+ ../lib/list.cc ../machine/interrupt.h ../machine/callback.h \
+ ../machine/stats.h ../threads/alarm.h ../machine/timer.h
 translate.o: ../machine/translate.cc /usr/include/stdc-predef.h \
  ../lib/copyright.h ../threads/main.h ../lib/debug.h ../lib/utility.h \
  ../lib/sysdep.h /usr/include/c++/8.2.1/iostream \
@@ -1389,9 +1456,22 @@ translate.o: ../machine/translate.cc /usr/include/stdc-predef.h \
  /usr/include/string.h /usr/include/strings.h ../threads/kernel.h \
  ../threads/thread.h ../machine/machine.h ../machine/translate.h \
  ../userprog/addrspace.h ../filesys/filesys.h ../filesys/openfile.h \
- ../threads/scheduler.h ../lib/list.h ../lib/list.cc \
- ../machine/interrupt.h ../machine/callback.h ../machine/stats.h \
- ../threads/alarm.h ../machine/timer.h
+ ../filesys/filehdrmap.h /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../threads/scheduler.h ../lib/list.h \
+ ../lib/list.cc ../machine/interrupt.h ../machine/callback.h \
+ ../machine/stats.h ../threads/alarm.h ../machine/timer.h
 network.o: ../machine/network.cc /usr/include/stdc-predef.h \
  ../lib/copyright.h ../machine/network.h ../lib/utility.h \
  ../machine/callback.h ../threads/main.h ../lib/debug.h ../lib/sysdep.h \
@@ -1515,9 +1595,22 @@ network.o: ../machine/network.cc /usr/include/stdc-predef.h \
  /usr/include/string.h /usr/include/strings.h ../threads/kernel.h \
  ../threads/thread.h ../machine/machine.h ../machine/translate.h \
  ../userprog/addrspace.h ../filesys/filesys.h ../filesys/openfile.h \
- ../threads/scheduler.h ../lib/list.h ../lib/list.cc \
- ../machine/interrupt.h ../machine/stats.h ../threads/alarm.h \
- ../machine/timer.h
+ ../filesys/filehdrmap.h /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../threads/scheduler.h ../lib/list.h \
+ ../lib/list.cc ../machine/interrupt.h ../machine/stats.h \
+ ../threads/alarm.h ../machine/timer.h
 disk.o: ../machine/disk.cc /usr/include/stdc-predef.h ../lib/copyright.h \
  ../machine/disk.h ../lib/utility.h ../machine/callback.h ../lib/debug.h \
  ../lib/sysdep.h /usr/include/c++/8.2.1/iostream \
@@ -1640,7 +1733,21 @@ disk.o: ../machine/disk.cc /usr/include/stdc-predef.h ../lib/copyright.h \
  /usr/include/string.h /usr/include/strings.h ../threads/main.h \
  ../threads/kernel.h ../threads/thread.h ../machine/machine.h \
  ../machine/translate.h ../userprog/addrspace.h ../filesys/filesys.h \
- ../filesys/openfile.h ../threads/scheduler.h ../lib/list.h \
+ ../filesys/openfile.h ../filesys/filehdrmap.h \
+ /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../threads/scheduler.h ../lib/list.h \
  ../lib/list.cc ../machine/interrupt.h ../machine/stats.h \
  ../threads/alarm.h ../machine/timer.h
 alarm.o: ../threads/alarm.cc /usr/include/stdc-predef.h \
@@ -1766,8 +1873,21 @@ alarm.o: ../threads/alarm.cc /usr/include/stdc-predef.h \
  /usr/include/string.h /usr/include/strings.h ../threads/kernel.h \
  ../threads/thread.h ../machine/machine.h ../machine/translate.h \
  ../userprog/addrspace.h ../filesys/filesys.h ../filesys/openfile.h \
- ../threads/scheduler.h ../lib/list.h ../lib/list.cc \
- ../machine/interrupt.h ../machine/stats.h
+ ../filesys/filehdrmap.h /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../threads/scheduler.h ../lib/list.h \
+ ../lib/list.cc ../machine/interrupt.h ../machine/stats.h
 kernel.o: ../threads/kernel.cc /usr/include/stdc-predef.h \
  ../lib/copyright.h ../lib/debug.h ../lib/utility.h ../lib/sysdep.h \
  /usr/include/c++/8.2.1/iostream \
@@ -1890,7 +2010,21 @@ kernel.o: ../threads/kernel.cc /usr/include/stdc-predef.h \
  /usr/include/string.h /usr/include/strings.h ../threads/main.h \
  ../threads/kernel.h ../threads/thread.h ../machine/machine.h \
  ../machine/translate.h ../userprog/addrspace.h ../filesys/filesys.h \
- ../filesys/openfile.h ../threads/scheduler.h ../lib/list.h \
+ ../filesys/openfile.h ../filesys/filehdrmap.h \
+ /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../threads/scheduler.h ../lib/list.h \
  ../lib/list.cc ../machine/interrupt.h ../machine/callback.h \
  ../machine/stats.h ../threads/alarm.h ../machine/timer.h \
  ../threads/synch.h ../threads/synchlist.h ../threads/synchlist.cc \
@@ -2019,9 +2153,22 @@ main.o: ../threads/main.cc /usr/include/stdc-predef.h ../lib/copyright.h \
  /usr/include/string.h /usr/include/strings.h ../threads/kernel.h \
  ../threads/thread.h ../machine/machine.h ../machine/translate.h \
  ../userprog/addrspace.h ../filesys/filesys.h ../filesys/openfile.h \
- ../threads/scheduler.h ../lib/list.h ../lib/list.cc \
- ../machine/interrupt.h ../machine/callback.h ../machine/stats.h \
- ../threads/alarm.h ../machine/timer.h
+ ../filesys/filehdrmap.h /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../threads/scheduler.h ../lib/list.h \
+ ../lib/list.cc ../machine/interrupt.h ../machine/callback.h \
+ ../machine/stats.h ../threads/alarm.h ../machine/timer.h
 scheduler.o: ../threads/scheduler.cc /usr/include/stdc-predef.h \
  ../lib/copyright.h ../lib/debug.h ../lib/utility.h ../lib/sysdep.h \
  /usr/include/c++/8.2.1/iostream \
@@ -2144,7 +2291,21 @@ scheduler.o: ../threads/scheduler.cc /usr/include/stdc-predef.h \
  /usr/include/string.h /usr/include/strings.h ../threads/scheduler.h \
  ../lib/list.h ../lib/list.cc ../threads/thread.h ../machine/machine.h \
  ../machine/translate.h ../userprog/addrspace.h ../filesys/filesys.h \
- ../filesys/openfile.h ../threads/main.h ../threads/kernel.h \
+ ../filesys/openfile.h ../filesys/filehdrmap.h \
+ /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../threads/main.h ../threads/kernel.h \
  ../machine/interrupt.h ../machine/callback.h ../machine/stats.h \
  ../threads/alarm.h ../machine/timer.h
 synch.o: ../threads/synch.cc /usr/include/stdc-predef.h \
@@ -2268,7 +2429,21 @@ synch.o: ../threads/synch.cc /usr/include/stdc-predef.h \
  /usr/include/c++/8.2.1/bits/istream.tcc /usr/include/c++/8.2.1/stdlib.h \
  /usr/include/string.h /usr/include/strings.h ../machine/machine.h \
  ../machine/translate.h ../userprog/addrspace.h ../filesys/filesys.h \
- ../filesys/openfile.h ../lib/list.h ../lib/debug.h ../lib/list.cc \
+ ../filesys/openfile.h ../filesys/filehdrmap.h \
+ /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../lib/list.h ../lib/debug.h ../lib/list.cc \
  ../threads/main.h ../threads/kernel.h ../threads/scheduler.h \
  ../machine/interrupt.h ../machine/callback.h ../machine/stats.h \
  ../threads/alarm.h ../machine/timer.h
@@ -2394,7 +2569,21 @@ synchlist.o: ../threads/synchlist.cc /usr/include/stdc-predef.h \
  /usr/include/string.h /usr/include/strings.h ../lib/list.cc \
  ../threads/synch.h ../threads/thread.h ../machine/machine.h \
  ../machine/translate.h ../userprog/addrspace.h ../filesys/filesys.h \
- ../filesys/openfile.h ../threads/main.h ../threads/kernel.h \
+ ../filesys/openfile.h ../filesys/filehdrmap.h \
+ /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../threads/main.h ../threads/kernel.h \
  ../threads/scheduler.h ../machine/interrupt.h ../machine/callback.h \
  ../machine/stats.h ../threads/alarm.h ../machine/timer.h \
  ../threads/synchlist.cc
@@ -2519,7 +2708,21 @@ thread.o: ../threads/thread.cc /usr/include/stdc-predef.h \
  /usr/include/c++/8.2.1/bits/istream.tcc /usr/include/c++/8.2.1/stdlib.h \
  /usr/include/string.h /usr/include/strings.h ../machine/machine.h \
  ../machine/translate.h ../userprog/addrspace.h ../filesys/filesys.h \
- ../filesys/openfile.h ../threads/switch.h ../threads/synch.h \
+ ../filesys/openfile.h ../filesys/filehdrmap.h \
+ /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../threads/switch.h ../threads/synch.h \
  ../lib/list.h ../lib/debug.h ../lib/list.cc ../threads/main.h \
  ../threads/kernel.h ../threads/scheduler.h ../machine/interrupt.h \
  ../machine/callback.h ../machine/stats.h ../threads/alarm.h \
@@ -2645,11 +2848,25 @@ threadtest.o: ../threads/threadtest.cc /usr/include/stdc-predef.h \
  /usr/include/c++/8.2.1/bits/istream.tcc /usr/include/c++/8.2.1/stdlib.h \
  /usr/include/string.h /usr/include/strings.h ../threads/thread.h \
  ../machine/machine.h ../machine/translate.h ../userprog/addrspace.h \
- ../filesys/filesys.h ../filesys/openfile.h ../threads/scheduler.h \
- ../lib/list.h ../lib/list.cc ../machine/interrupt.h \
- ../machine/callback.h ../machine/stats.h ../threads/alarm.h \
- ../machine/timer.h ../threads/main.h ../filesys/filehdr.h \
- ../machine/disk.h ../filesys/pbitmap.h ../lib/bitmap.h
+ ../filesys/filesys.h ../filesys/openfile.h ../filesys/filehdrmap.h \
+ /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../threads/scheduler.h ../lib/list.h \
+ ../lib/list.cc ../machine/interrupt.h ../machine/callback.h \
+ ../machine/stats.h ../threads/alarm.h ../machine/timer.h \
+ ../threads/main.h ../filesys/filehdr.h ../machine/disk.h \
+ ../filesys/pbitmap.h
 addrspace.o: ../userprog/addrspace.cc /usr/include/stdc-predef.h \
  ../lib/copyright.h ../threads/main.h ../lib/debug.h ../lib/utility.h \
  ../lib/sysdep.h /usr/include/c++/8.2.1/iostream \
@@ -2772,9 +2989,23 @@ addrspace.o: ../userprog/addrspace.cc /usr/include/stdc-predef.h \
  /usr/include/string.h /usr/include/strings.h ../threads/kernel.h \
  ../threads/thread.h ../machine/machine.h ../machine/translate.h \
  ../userprog/addrspace.h ../filesys/filesys.h ../filesys/openfile.h \
- ../threads/scheduler.h ../lib/list.h ../lib/list.cc \
- ../machine/interrupt.h ../machine/callback.h ../machine/stats.h \
- ../threads/alarm.h ../machine/timer.h ../userprog/noff.h
+ ../filesys/filehdrmap.h /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../threads/scheduler.h ../lib/list.h \
+ ../lib/list.cc ../machine/interrupt.h ../machine/callback.h \
+ ../machine/stats.h ../threads/alarm.h ../machine/timer.h \
+ ../userprog/noff.h
 exception.o: ../userprog/exception.cc /usr/include/stdc-predef.h \
  ../lib/copyright.h ../threads/main.h ../lib/debug.h ../lib/utility.h \
  ../lib/sysdep.h /usr/include/c++/8.2.1/iostream \
@@ -2897,10 +3128,23 @@ exception.o: ../userprog/exception.cc /usr/include/stdc-predef.h \
  /usr/include/string.h /usr/include/strings.h ../threads/kernel.h \
  ../threads/thread.h ../machine/machine.h ../machine/translate.h \
  ../userprog/addrspace.h ../filesys/filesys.h ../filesys/openfile.h \
- ../threads/scheduler.h ../lib/list.h ../lib/list.cc \
- ../machine/interrupt.h ../machine/callback.h ../machine/stats.h \
- ../threads/alarm.h ../machine/timer.h ../userprog/syscall.h \
- ../userprog/errno.h ../userprog/ksyscall.h
+ ../filesys/filehdrmap.h /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../threads/scheduler.h ../lib/list.h \
+ ../lib/list.cc ../machine/interrupt.h ../machine/callback.h \
+ ../machine/stats.h ../threads/alarm.h ../machine/timer.h \
+ ../userprog/syscall.h ../userprog/errno.h ../userprog/ksyscall.h
 synchconsole.o: ../userprog/synchconsole.cc /usr/include/stdc-predef.h \
  ../lib/copyright.h ../userprog/synchconsole.h ../lib/utility.h \
  ../machine/callback.h ../machine/console.h ../threads/synch.h \
@@ -3023,7 +3267,21 @@ synchconsole.o: ../userprog/synchconsole.cc /usr/include/stdc-predef.h \
  /usr/include/c++/8.2.1/bits/istream.tcc /usr/include/c++/8.2.1/stdlib.h \
  /usr/include/string.h /usr/include/strings.h ../machine/machine.h \
  ../machine/translate.h ../userprog/addrspace.h ../filesys/filesys.h \
- ../filesys/openfile.h ../lib/list.h ../lib/debug.h ../lib/list.cc \
+ ../filesys/openfile.h ../filesys/filehdrmap.h \
+ /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../lib/list.h ../lib/debug.h ../lib/list.cc \
  ../threads/main.h ../threads/kernel.h ../threads/scheduler.h \
  ../machine/interrupt.h ../machine/stats.h ../threads/alarm.h \
  ../machine/timer.h
@@ -3273,9 +3531,24 @@ filehdr.o: ../filesys/filehdr.cc /usr/include/stdc-predef.h \
  /usr/include/string.h /usr/include/strings.h ../lib/debug.h \
  ../filesys/synchdisk.h ../threads/synch.h ../threads/thread.h \
  ../machine/machine.h ../machine/translate.h ../userprog/addrspace.h \
- ../filesys/filesys.h ../lib/list.h ../lib/list.cc ../threads/main.h \
- ../threads/kernel.h ../threads/scheduler.h ../machine/interrupt.h \
- ../machine/stats.h ../threads/alarm.h ../machine/timer.h
+ ../filesys/filesys.h ../filesys/filehdrmap.h \
+ /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h \
+ /usr/include/c++/8.2.1/array ../lib/list.h ../lib/list.cc \
+ ../threads/main.h ../threads/kernel.h ../threads/scheduler.h \
+ ../machine/interrupt.h ../machine/stats.h ../threads/alarm.h \
+ ../machine/timer.h
 filesys.o: ../filesys/filesys.cc /usr/include/stdc-predef.h \
  ../lib/copyright.h ../lib/debug.h ../lib/utility.h ../lib/sysdep.h \
  /usr/include/c++/8.2.1/iostream \
@@ -3398,7 +3671,25 @@ filesys.o: ../filesys/filesys.cc /usr/include/stdc-predef.h \
  /usr/include/string.h /usr/include/strings.h ../machine/disk.h \
  ../machine/callback.h ../filesys/pbitmap.h ../lib/bitmap.h \
  ../filesys/openfile.h ../filesys/directory.h ../filesys/filehdr.h \
- ../filesys/filesys.h
+ ../filesys/filesys.h ../filesys/filehdrmap.h \
+ /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h \
+ /usr/include/c++/8.2.1/array ../filesys/synchdisk.h ../threads/synch.h \
+ ../threads/thread.h ../machine/machine.h ../machine/translate.h \
+ ../userprog/addrspace.h ../lib/list.h ../lib/list.cc ../threads/main.h \
+ ../threads/kernel.h ../threads/scheduler.h ../machine/interrupt.h \
+ ../machine/stats.h ../threads/alarm.h ../machine/timer.h
 pbitmap.o: ../filesys/pbitmap.cc /usr/include/stdc-predef.h \
  ../lib/copyright.h ../filesys/pbitmap.h ../lib/bitmap.h ../lib/utility.h \
  ../filesys/openfile.h ../lib/sysdep.h /usr/include/c++/8.2.1/iostream \
@@ -3641,10 +3932,23 @@ openfile.o: ../filesys/openfile.cc /usr/include/stdc-predef.h \
  /usr/include/string.h /usr/include/strings.h ../threads/kernel.h \
  ../threads/thread.h ../machine/machine.h ../machine/translate.h \
  ../userprog/addrspace.h ../filesys/filesys.h ../filesys/openfile.h \
- ../threads/scheduler.h ../lib/list.h ../lib/list.cc \
- ../machine/interrupt.h ../machine/callback.h ../machine/stats.h \
- ../threads/alarm.h ../machine/timer.h ../filesys/filehdr.h \
- ../machine/disk.h ../filesys/pbitmap.h ../lib/bitmap.h \
+ ../filesys/filehdrmap.h /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../threads/scheduler.h ../lib/list.h \
+ ../lib/list.cc ../machine/interrupt.h ../machine/callback.h \
+ ../machine/stats.h ../threads/alarm.h ../machine/timer.h \
+ ../filesys/filehdr.h ../machine/disk.h ../filesys/pbitmap.h \
  ../filesys/synchdisk.h ../threads/synch.h
 synchdisk.o: ../filesys/synchdisk.cc /usr/include/stdc-predef.h \
  ../lib/copyright.h ../filesys/synchdisk.h ../machine/disk.h \
@@ -3768,10 +4072,98 @@ synchdisk.o: ../filesys/synchdisk.cc /usr/include/stdc-predef.h \
  /usr/include/c++/8.2.1/bits/istream.tcc /usr/include/c++/8.2.1/stdlib.h \
  /usr/include/string.h /usr/include/strings.h ../machine/machine.h \
  ../machine/translate.h ../userprog/addrspace.h ../filesys/filesys.h \
- ../filesys/openfile.h ../lib/list.h ../lib/debug.h ../lib/list.cc \
+ ../filesys/openfile.h ../filesys/filehdrmap.h \
+ /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../lib/list.h ../lib/debug.h ../lib/list.cc \
  ../threads/main.h ../threads/kernel.h ../threads/scheduler.h \
  ../machine/interrupt.h ../machine/stats.h ../threads/alarm.h \
  ../machine/timer.h
+filehdrmap.o: ../filesys/filehdrmap.cc /usr/include/stdc-predef.h \
+ ../filesys/filehdrmap.h /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_algobase.h \
+ /usr/include/c++/8.2.1/x86_64-pc-linux-gnu/bits/c++config.h \
+ /usr/include/c++/8.2.1/x86_64-pc-linux-gnu/bits/os_defines.h \
+ /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/include/bits/wordsize.h /usr/include/bits/long-double.h \
+ /usr/include/gnu/stubs.h /usr/include/gnu/stubs-64.h \
+ /usr/include/c++/8.2.1/x86_64-pc-linux-gnu/bits/cpu_defines.h \
+ /usr/include/c++/8.2.1/bits/functexcept.h \
+ /usr/include/c++/8.2.1/bits/exception_defines.h \
+ /usr/include/c++/8.2.1/bits/cpp_type_traits.h \
+ /usr/include/c++/8.2.1/ext/type_traits.h \
+ /usr/include/c++/8.2.1/ext/numeric_traits.h \
+ /usr/include/c++/8.2.1/bits/stl_pair.h \
+ /usr/include/c++/8.2.1/bits/move.h \
+ /usr/include/c++/8.2.1/bits/concept_check.h \
+ /usr/include/c++/8.2.1/type_traits \
+ /usr/include/c++/8.2.1/bits/stl_iterator_base_types.h \
+ /usr/include/c++/8.2.1/bits/stl_iterator_base_funcs.h \
+ /usr/include/c++/8.2.1/debug/assertions.h \
+ /usr/include/c++/8.2.1/bits/stl_iterator.h \
+ /usr/include/c++/8.2.1/bits/ptr_traits.h \
+ /usr/include/c++/8.2.1/debug/debug.h \
+ /usr/include/c++/8.2.1/bits/predefined_ops.h \
+ /usr/include/c++/8.2.1/bits/allocator.h \
+ /usr/include/c++/8.2.1/x86_64-pc-linux-gnu/bits/c++allocator.h \
+ /usr/include/c++/8.2.1/ext/new_allocator.h /usr/include/c++/8.2.1/new \
+ /usr/include/c++/8.2.1/exception /usr/include/c++/8.2.1/bits/exception.h \
+ /usr/include/c++/8.2.1/bits/exception_ptr.h \
+ /usr/include/c++/8.2.1/bits/cxxabi_init_exception.h \
+ /usr/lib/gcc/x86_64-pc-linux-gnu/8.2.1/include/stddef.h \
+ /usr/include/c++/8.2.1/typeinfo /usr/include/c++/8.2.1/bits/hash_bytes.h \
+ /usr/include/c++/8.2.1/bits/nested_exception.h \
+ /usr/include/c++/8.2.1/bits/memoryfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/ext/alloc_traits.h \
+ /usr/include/c++/8.2.1/bits/alloc_traits.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/initializer_list \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/functional_hash.h \
+ /usr/include/c++/8.2.1/bits/range_access.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h /usr/include/c++/8.2.1/cstdlib \
+ /usr/include/stdlib.h /usr/include/bits/libc-header-start.h \
+ /usr/include/bits/waitflags.h /usr/include/bits/waitstatus.h \
+ /usr/include/bits/floatn.h /usr/include/bits/floatn-common.h \
+ /usr/include/bits/types/locale_t.h /usr/include/bits/types/__locale_t.h \
+ /usr/include/sys/types.h /usr/include/bits/types.h \
+ /usr/include/bits/typesizes.h /usr/include/bits/types/clock_t.h \
+ /usr/include/bits/types/clockid_t.h /usr/include/bits/types/time_t.h \
+ /usr/include/bits/types/timer_t.h /usr/include/bits/stdint-intn.h \
+ /usr/include/endian.h /usr/include/bits/endian.h \
+ /usr/include/bits/byteswap.h /usr/include/bits/uintn-identity.h \
+ /usr/include/sys/select.h /usr/include/bits/select.h \
+ /usr/include/bits/types/sigset_t.h /usr/include/bits/types/__sigset_t.h \
+ /usr/include/bits/types/struct_timeval.h \
+ /usr/include/bits/types/struct_timespec.h \
+ /usr/include/bits/pthreadtypes.h /usr/include/bits/thread-shared-types.h \
+ /usr/include/bits/pthreadtypes-arch.h /usr/include/alloca.h \
+ /usr/include/bits/stdlib-float.h /usr/include/c++/8.2.1/bits/std_abs.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits /usr/include/c++/8.2.1/ctime \
+ /usr/include/time.h /usr/include/bits/time.h /usr/include/bits/timex.h \
+ /usr/include/bits/types/struct_tm.h \
+ /usr/include/bits/types/struct_itimerspec.h
+segment.o: ../filesys/segment.cc /usr/include/stdc-predef.h \
+ ../filesys/segment.h ../lib/bitmap.h ../lib/copyright.h ../lib/utility.h
 post.o: ../network/post.cc /usr/include/stdc-predef.h ../lib/copyright.h \
  ../network/post.h ../lib/utility.h ../machine/callback.h \
  ../machine/network.h ../threads/synchlist.h ../lib/list.h ../lib/debug.h \
@@ -3895,7 +4287,21 @@ post.o: ../network/post.cc /usr/include/stdc-predef.h ../lib/copyright.h \
  /usr/include/string.h /usr/include/strings.h ../lib/list.cc \
  ../threads/synch.h ../threads/thread.h ../machine/machine.h \
  ../machine/translate.h ../userprog/addrspace.h ../filesys/filesys.h \
- ../filesys/openfile.h ../threads/main.h ../threads/kernel.h \
+ ../filesys/openfile.h ../filesys/filehdrmap.h \
+ /usr/include/c++/8.2.1/vector \
+ /usr/include/c++/8.2.1/bits/stl_construct.h \
+ /usr/include/c++/8.2.1/bits/stl_uninitialized.h \
+ /usr/include/c++/8.2.1/bits/stl_vector.h \
+ /usr/include/c++/8.2.1/bits/stl_bvector.h \
+ /usr/include/c++/8.2.1/bits/vector.tcc /usr/include/c++/8.2.1/algorithm \
+ /usr/include/c++/8.2.1/utility /usr/include/c++/8.2.1/bits/stl_relops.h \
+ /usr/include/c++/8.2.1/bits/stl_algo.h \
+ /usr/include/c++/8.2.1/bits/algorithmfwd.h \
+ /usr/include/c++/8.2.1/bits/stl_heap.h \
+ /usr/include/c++/8.2.1/bits/stl_tempbuf.h \
+ /usr/include/c++/8.2.1/bits/uniform_int_dist.h \
+ /usr/include/c++/8.2.1/limits ../filesys/segment.h ../lib/bitmap.h \
+ /usr/include/c++/8.2.1/array ../threads/main.h ../threads/kernel.h \
  ../threads/scheduler.h ../machine/interrupt.h ../machine/stats.h \
  ../threads/alarm.h ../machine/timer.h ../threads/synchlist.cc
 # DEPENDENCIES MUST END AT END OF FILE

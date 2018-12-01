@@ -132,6 +132,7 @@ FileHeader::FileHeader()
 void
 FileHeader::initAllData(PersistentBitmap *freeMap, int num)
 {
+    // TODO: change the allocation type here
     for(int i =0; i < NumIndirect; i++)
         indirects[i] = -1;
     doubleIndirect = -1;
@@ -229,6 +230,7 @@ FileHeader::Allocate(PersistentBitmap *freeMap, int fileSize)
 void 
 FileHeader::Deallocate(PersistentBitmap *freeMap)
 {
+    // TODO: change the delocation type here
     for(int i = 0; i < NumDirect; i ++)
     {
         if(dataSectors[i] != -1)
@@ -305,6 +307,7 @@ FileHeader::WriteBack(int sector)
 int
 FileHeader::ByteToSector(int offset)
 {
+    // TODO: change the allocation type here
     int ret;
     ASSERT(offset <= (numSectors + 1)*SectorSize)
     if(offset > numBytes)

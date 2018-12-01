@@ -2,27 +2,43 @@
 // store the location of all file in log
 // this will take up 4 sector in disk to store this
 // (in check point)
-// there is trick here, index in array is the index of
-// sector in disk ,while the value is
+// the version in filehdr is implement by last access time
+// each operation to this file header would change this.
 
 #ifndef FILEHDRMAP_H
 #define FILEHDRMAP_H
 
-#include <array>
+#include <vector>
 #include <algorithm>
+#include <exception>
 
-#define NumSectors 128
+class HdrInfo
+{
+  public:
+    HdrInfo(){};
+    HdrInfo(int fileHashCode, int logOffset);
+
+    int last_access;
+    int fileHashCode;
+    int logOffset;
+
+    bool operator==(const HdrInfo &other);
+};
 
 class FileHdrMap
 {
   private:
-    std::array<int, NumSectors> fileHdrs;
+    std::vector<HdrInfo> fileHdrs;
 
   public:
-    FileHdrMap();
-    bool AddFileHdr(int fileHashCode, int sectorNum); // add or update the position of
+    FileHdrMap(){};
+    int FindFileHeader(char* name) throw (std::out_of_range);                      // get the sector number of a file by it's name        
+    void UpdateFileHdr(int fileHashCode, int logOffset); // add or update the position of
                                                       // an file header
-    bool DeleteFileHdr(int fileHashCode);
+    bool DeleteFileHdr(int fileHashCode);               // delete an entry in map
+    std::vector<HdrInfo>& GetAllEntries(){ return fileHdrs; } 
+    void SetAllEntires(std::vector<HdrInfo>& entires){ fileHdrs = entires;};
+    void ClearAll();
 };
 
 #endif

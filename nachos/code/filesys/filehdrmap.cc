@@ -1,30 +1,68 @@
 #include "filehdrmap.h"
+#include <ctime>
+#include <functional>
 
-FileHdrMap::FileHdrMap()
+HdrInfo::HdrInfo(int fileHashCode, int logOffset)
 {
-    fileHdrs.fill(-1);
+    this->fileHashCode = fileHashCode;
+    this->logOffset =  logOffset;
+    this->last_access = std::time(nullptr);
 }
 
-bool FileHdrMap::AddFileHdr(int fileHashCode, int sectorNum)
+bool HdrInfo::operator==(const HdrInfo &other)
 {
-    if (fileHdrs[sectorNum] != -1 || fileHdrs[sectorNum] != fileHashCode)
+    return (fileHashCode==other.fileHashCode);
+}
+
+void FileHdrMap::UpdateFileHdr(int fileHashCode, int logOffset)
+{
+    for(auto info :  fileHdrs)
     {
-        return false;
+        if(info.fileHashCode == fileHashCode)
+        {
+            info.logOffset = logOffset;
+            info.last_access = std::time(nullptr);
+            return;
+        }
     }
-    fileHdrs[sectorNum] = fileHashCode;
-    return true;
+    fileHdrs.push_back(HdrInfo(fileHashCode, logOffset));
+    return;
 }
 
 bool FileHdrMap::DeleteFileHdr(int fileHashCode)
 {
-    auto pos = std::find(fileHdrs.begin(), fileHdrs.end(), fileHashCode);
-    if (pos == fileHdrs.end())
+    for(auto it = fileHdrs.begin(); it != fileHdrs.end();)
     {
-        return false;
+        if((*it).fileHashCode == fileHashCode)
+        {
+            it = fileHdrs.erase(it);
+        }
+        else
+        {
+            it++;
+        }
     }
-    else
+}
+
+// all file header is stored in fileHdrMap, we can get this directly 
+// from memory
+int FileHdrMap::FindFileHeader(char* name) throw (std::out_of_range)
+{
+    // calculate the hash code of file name, which is more easy
+    // to save in disk
+    int sector = -1;
+    std::hash<std::string> hash_fn;
+    int nameHash = hash_fn(std::string(name));
+    for(auto fd : fileHdrs)
     {
-        (*pos) = -1;
-        return true;
+        if(nameHash == fd.fileHashCode)
+        {
+            sector = fd.fileHashCode;
+            break;
+        }
     }
+    if( sector == -1)
+        throw std::out_of_range("file header is not in range!");
+    
+    return sector;
 }

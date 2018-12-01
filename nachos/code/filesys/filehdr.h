@@ -35,15 +35,15 @@
 // limits the maximum file length to just under 4K bytes.
 //
 // There is no constructor; rather the file header can be initialized
-// by allocating blocks for the file (if it is a new file), or by
+// by allocating blocks for the file (if it i a new file), or by
 // reading it from disk.
 
-// in order to store a file larger than 4k bytes, I use a Indirect node
-// combine withs doublely direct node. which work as 3 layer data structure
-// which is similar to multi-path tree structure.
-// although one double node can satisfy the file large as whole disk
-// right now, in order to decrease the time expanse of find a block
-// direct access and one level access is still kept in current file header
+// in order to store a file larger than 4k byes, I use a Indirect node
+// combine withs doublely direct node. which ork as 3 layer data structure
+// which is similar to multi-path tree structre.
+// although one double node can satisfy the fle large as whole disk
+// right now, in order to decrease the time epanse of find a block
+// direct access and one level access is stil kept in current file header
 
 // work as direct data block
 class IndirectHeader
@@ -80,21 +80,6 @@ class DoubleIndirectHeader
     void WriteBack(int sectorNumber);
     int ByteToSector(int offset, PersistentBitmap *freeMap);
 };
-
-// // full of pointer to indirect datd block 
-// class DoubleIndirectHeader
-// {
-//   public:
-//     int indirectHeaders[NumData];
-//     DoubleIndirectHeader()
-//     {
-//         for(int i = 0; i < NumData; i++)
-//             indirectHeaders[0] = -1;
-//     }
-//     void Deallocate(PersistentBitmap *freeMap);
-//     // void FetchFrom(int sectorNumber); 	
-//     // void WriteBack(int sectorNumber);    
-// };
 
 class FileHeader {
   public:

@@ -52,7 +52,7 @@ class Kernel {
     Machine *machine;           // the simulated CPU
     SynchConsoleInput *synchConsoleIn;
     SynchConsoleOutput *synchConsoleOut;
-    SynchDisk *synchDisk;
+    IDiskDecorator *synchDisk;
     FileSystem *fileSystem;     
     PostOfficeInput *postOfficeIn;
     PostOfficeOutput *postOfficeOut;

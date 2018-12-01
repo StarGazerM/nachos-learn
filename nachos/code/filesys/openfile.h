@@ -66,6 +66,7 @@ class OpenFile {
   public:
     OpenFile(int sector);		// Open a file whose header is located
 					// at "sector" on the disk
+		OpenFile(int sector, char* name);
     ~OpenFile();			// Close the file
 
     void Seek(int position); 		// Set the position from which to 
@@ -86,8 +87,10 @@ class OpenFile {
 					// file (this interface is simpler 
 					// than the UNIX idiom -- lseek to 
 					// end of file, tell, lseek back 
+		char* GetFileName(){ return fileName; }
     
   private:
+		char *fileName;				// the name of the file 
     FileHeader *hdr;			// Header for this file 
     int seekPosition;			// Current position within the file
 };

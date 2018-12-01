@@ -51,6 +51,8 @@
 #include "directory.h"
 #include "filehdr.h"
 #include "filesys.h"
+#include "synchdisk.h"
+#include "main.h"
 
 // Sectors containing the file headers for the bitmap of free sectors,
 // and the directory of files.  These file headers are placed in well-known 
@@ -143,6 +145,9 @@ FileSystem::FileSystem(bool format)
         // the bitmap and directory; these are left open while Nachos is running
         freeMapFile = new OpenFile(FreeMapSector);
         directoryFile = new OpenFile(DirectorySector);
+
+        // if not format restore fileheader map and segment table from checkpoint
+        fileHrdMap = new FileHdrMap();
     }
 }
 
@@ -229,7 +234,7 @@ FileSystem::Create(char *name, int initialSize)
 //
 //	"name" -- the text name of the file to be opened
 //----------------------------------------------------------------------
-
+#ifndef LOG_FS
 OpenFile *
 FileSystem::Open(char *name)
 { 
@@ -245,6 +250,33 @@ FileSystem::Open(char *name)
     delete directory;
     return openFile;				// return NULL if not found
 }
+
+#else
+//----------------------------------------------------------------------
+// open file in LFS
+// 1. first get file header sector number in map
+// 2. fetch that block from cache
+//----------------------------------------------------------------------
+OpenFile *
+FileSystem::Open(char *name)
+{
+    // Directory *directory = new Directory(NumDirEntries);
+    int sector; 
+    OpenFile *openFile = NULL;
+    try
+    {
+        sector = fileHrdMap->FindFileHeader(name);
+    }
+    catch(const std::out_of_range &e)
+    {
+        e.what();
+        Abort();   
+    }
+    openFile = new OpenFile(sector);
+    return openFile;
+}
+
+#endif
 
 //----------------------------------------------------------------------
 // FileSystem::Remove
@@ -343,5 +375,113 @@ FileSystem::Print()
     delete freeMap;
     delete directory;
 } 
+
+//--------------------------------------------------------------------
+// Save maps into disk
+// Currently, file header map will be save to sector 3 and sector 4
+// the first 4 byte in sector 3 is number of entries in file header
+// map 
+// REFECTOR: change the type operation here to sstream way!
+// nachos's code style is terrible, we need a more cpp way
+//--------------------------------------------------------------------
+void FileSystem::SaveToCheckPoint()
+{
+    auto headers = fileHrdMap->GetAllEntries();
+    int len = headers.size();
+
+    HdrInfo *hdrbuf = new HdrInfo[len];
+    for(int i = 0; i < len; i++)
+    {
+        hdrbuf[i] = headers[i];
+    }
+    char *hdrcheckp = new char[2*SectorSize];
+    memcpy(&(hdrcheckp[0]), &len, sizeof(int));  // copy the number of entries to 
+                                                // begin of the sector
+    memcpy(&(hdrcheckp[sizeof(int)]), hdrbuf, sizeof(HdrInfo)*len);
+                                                // copy the content of map
+    kernel->synchDisk->WriteSector(3 ,hdrcheckp);
+    kernel->synchDisk->WriteSector(4, &(hdrcheckp[SectorSize]));
+
+    // save the status of segment summary to the head of each segment
+    int start = SegSize - 1; // the start of all writable data is at 15 sector
+    for(int i = 0; i < NumSeg; i++)
+    {
+        char* summaryTmp = new char[SectorSize];
+        SegmentSummary& sumref = segTable[i]->GetSummay();
+        unsigned int* usageBits = segTable[i]->GetUsage()->GetBits();
+        int size = (segTable[i]->GetUsage()->GetNumWords()) * sizeof(unsigned int);
+        memcpy(&(summaryTmp[0]), &(sumref[0]), sizeof(SegmentSummary));         // save summary entry
+        memcpy(&(summaryTmp[sizeof(SegmentSummary)]), usageBits, size);         // save the bit map which mark the live data
+        kernel->synchDisk->WriteSector((i*SegSize+start), summaryTmp);
+    }
+
+    delete hdrbuf;
+    delete hdrcheckp;
+}
+
+
+//--------------------------------------------------------------------
+// read all info from checkpoint, this will be evoked when file system
+// initalize
+//--------------------------------------------------------------------
+void FileSystem::RestoreFromCheckPoint()
+{
+    //TODO: clear original map first
+    char *hdrcheckp = new char[2*SectorSize];
+    kernel->synchDisk->ReadSector(3, hdrcheckp);
+    kernel->synchDisk->ReadSector(4, &(hdrcheckp[SectorSize]));
+    int len;        // read the number of entries first
+    memcpy(&len, &(hdrcheckp[0]), sizeof(int));
+    HdrInfo *hdrbuf = new HdrInfo[len];
+    memcpy(hdrbuf, &(hdrcheckp[sizeof(int)]),sizeof(HdrInfo)*len);
+
+    std::vector<HdrInfo> tmpv;
+    for(int i = 0; i < len; i++)
+    {
+        tmpv.push_back(hdrbuf[i]);
+    }
+    fileHrdMap->SetAllEntires(tmpv);
+
+    // read all SegmentSummay into memory
+    // it is not necessary, but it can speed up the running of system
+    // this is eager version, lazy version can be useful somehow, when 
+    // the disk is large
+    int start = SegSize - 1; 
+    for(int i = 0; i < NumSeg; i++)
+    {
+        char* summaryTmp = new char[SectorSize];
+        kernel->synchDisk->ReadSector((start+i*SegSize), summaryTmp);
+        DiskSegment* segment = new DiskSegment(i*SegSize+start);
+        SegmentSummary& sumref = segment->GetSummay();
+        unsigned int* usageBits = segment->GetUsage()->GetBits();
+        int size = (segment->GetUsage()->GetNumWords()) * sizeof(unsigned int);
+        memcpy(&(sumref[0]), &(summaryTmp[0]), sizeof(SegmentSummary));         
+        memcpy(usageBits, &(summaryTmp[sizeof(SegmentSummary)]), size);
+
+        // calculate the tail of current segment
+        int counter = 0;
+        int end = segment->GetEnd();
+        while(segment->GetSummay[counter].fileHashcode == -1)
+        {
+            counter++;
+            end++;
+        }
+        segment->SetEnd(end);
+        segTable[i] = segment;         
+    }
+    // find the first clean segment as current write cursor
+    currentSeg = 0;
+    for(auto s :  segTable)
+    {
+        currentSeg++;
+        if(s->IsClean())
+        {
+            break;
+        }
+    }
+
+    delete hdrbuf;
+    delete hdrcheckp;
+}
 
 #endif // FILESYS_STUB

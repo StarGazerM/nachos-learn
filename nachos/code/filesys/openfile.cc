@@ -33,6 +33,12 @@ OpenFile::OpenFile(int sector)
     seekPosition = 0;
 }
 
+OpenFile::OpenFile(int sector, char* name)
+{
+    hdr = new FileHeader;
+    hdr->FetchFrom(sector);
+    seekPosition = 0;
+}
 //----------------------------------------------------------------------
 // OpenFile::~OpenFile
 // 	Close a Nachos file, de-allocating any in-memory data structures.
@@ -73,6 +79,7 @@ OpenFile::Seek(int position)
 int
 OpenFile::Read(char *into, int numBytes)
 {
+   kernel->currentThread->SetCurrentFD(this);
    int result = ReadAt(into, numBytes, seekPosition);
    seekPosition += result;
    return result;
@@ -115,6 +122,7 @@ OpenFile::Write(char *into, int numBytes)
 int
 OpenFile::ReadAt(char *into, int numBytes, int position)
 {
+    kernel->currentThread->SetCurrentFD(this);
     int fileLength = hdr->FileLength();
     int i, firstSector, lastSector, numSectors;
     char *buf;
@@ -144,6 +152,7 @@ OpenFile::ReadAt(char *into, int numBytes, int position)
 int
 OpenFile::WriteAt(char *from, int numBytes, int position)
 {
+    kernel->currentThread->SetCurrentFD(this);
     int realNumBytes = numBytes;
     int fileLength = hdr->FileLength();
     int i, firstSector, lastSector, numSectors;

@@ -92,3 +92,40 @@ SynchDisk::CallBack()
 { 
     semaphore->V();
 }
+
+IDiskDecorator::~IDiskDecorator()
+{
+    delete _disk;
+}
+
+WithLogCache::WithLogCache(IDisk *disk):IDiskDecorator(disk)
+{
+    cache = new LogCache();
+}
+
+void WithLogCache::ReadSector(int sectorNumber, char* data)
+{
+    try
+    {
+        cache->Read(sectorNumber, data);
+    }
+    catch(const std::out_of_range& e)
+    {
+        // handle cache miss here, dirctely read from disk
+        IDiskDecorator::ReadSector(sectorNumber, data);
+    }
+    
+}
+
+void WithLogCache::WriteSector(int sectorNumber, char* data)
+{
+    char* name = kernel->currentThread->GetCurrentFD()->GetFileName();
+    std::hash<std::string> hash_fn;
+    int nameHash = hash_fn(std::string(name));
+    cache->Append(sectorNumber, data, nameHash, _disk);
+}
+
+WithLogCache::~WithLogCache()
+{
+    delete  cache;
+}
