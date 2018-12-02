@@ -16,14 +16,13 @@
 #include <array>
 #include <vector>
 #include <map>
-#include <exception>
-// #include "synchdisk.h"
+#include <stdexcept>
+
 class IDisk;
-
 // buffer size is two sector
-#define BUFFER_SIZE 2 * SectorSize * 16
+#define BUFFER_SIZE 2 * 128 * 16
 
-using SectorArray = std::array<char, SectorSize>;
+using SectorArray = std::array<char, 128>;
 using NameHashCode = int; 
 
 // log cache is use for write operation

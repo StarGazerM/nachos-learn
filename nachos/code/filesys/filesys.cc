@@ -517,7 +517,7 @@ void FileSystem::RestoreFromCheckPoint()
         // calculate the tail of current segment
         int counter = 0;
         int end = segment->GetEnd();
-        while(segment->GetSummay[counter].fileHashcode == -1)
+        while((segment->GetSummay()[counter]).fileHashCode == -1)
         {
             counter++;
             end++;

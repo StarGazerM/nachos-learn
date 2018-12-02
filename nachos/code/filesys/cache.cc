@@ -1,7 +1,7 @@
 #include "cache.h"
 #include <cstring>
-#include "synchdisk.h"
 #include "main.h"
+#include "disk.h"
 
 LogCache::LogCache()
 {

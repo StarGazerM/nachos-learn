@@ -314,7 +314,7 @@ FILESYS_C =../filesys/directory.cc\
 	../filesys/segment.cc\
 	../filesys/cache.cc
 
-FILESYS_O =directory.o filehdr.o filesys.o pbitmap.o openfile.o synchdisk.o filehdrmap.o segment.o
+FILESYS_O =directory.o filehdr.o filesys.o pbitmap.o openfile.o synchdisk.o filehdrmap.o segment.o cache.o
 
 NETWORK_H = ../network/post.h
 

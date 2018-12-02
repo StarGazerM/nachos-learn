@@ -16,7 +16,8 @@
 
 #include "copyright.h"
 #include "synchdisk.h"
-
+#include "cache.h"
+#include "main.h"
 
 //----------------------------------------------------------------------
 // SynchDisk::SynchDisk

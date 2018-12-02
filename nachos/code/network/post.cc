@@ -18,6 +18,7 @@
 
 #include "copyright.h"
 #include "post.h"
+#include "main.h"
 
 //----------------------------------------------------------------------
 // Mail::Mail

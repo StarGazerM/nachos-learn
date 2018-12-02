@@ -14,8 +14,11 @@
 #include "disk.h"
 #include "synch.h"
 #include "callback.h"
-#include "cache.h"
 
+class LogCache;
+class ReadCache;
+class Semaphore;
+class Lock;
 // for different kind of file system, the ADT interface of disk 
 // operation will be different, In order to make current design 
 // more flexable, some design  need to be made on ......

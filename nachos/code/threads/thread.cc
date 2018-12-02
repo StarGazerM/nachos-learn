@@ -20,6 +20,7 @@
 #include "thread.h"
 #include "switch.h"
 #include "synch.h"
+#include "main.h"
 #include "sysdep.h"
 
 // this is put at the top of the execution stack, for detecting stack overflows
