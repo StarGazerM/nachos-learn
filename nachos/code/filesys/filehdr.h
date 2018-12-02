@@ -61,8 +61,12 @@ class IndirectHeader
 
     void Deallocate(PersistentBitmap *freeMap);
     void FetchFrom(int sectorNumber); 	
-    void WriteBack(int sectorNumber); 	
+    void WriteBack(int sectorNumber);
+#ifndef LOG_FS 	
     int ByteToSector(int offset, PersistentBitmap *freeMap);
+#else
+    int ByteToSector(int offset);
+#endif
 };
 
 // a block full of pointer to directs data block, whcih
@@ -79,7 +83,11 @@ class DoubleIndirectHeader
     void Deallocate(PersistentBitmap *freeMap);
     void FetchFrom(int sectorNumber); 	
     void WriteBack(int sectorNumber);
+#ifndef LOG_FS 	
     int ByteToSector(int offset, PersistentBitmap *freeMap);
+#else
+    int ByteToSector(int offset);
+#endif
 };
 
 class FileHeader {
@@ -88,8 +96,18 @@ class FileHeader {
     bool Allocate(PersistentBitmap *bitMap, int fileSize);// Initialize a file header, 
 						//  including allocating space 
 						//  on disk for the file data
+#ifdef LOG_FS
+    bool Allocate();    // allocate a empty file header
+    bool AppendOne(char* name, int sectorNumber);   // append one empty sector for this file
+#endif
     void Deallocate(PersistentBitmap *bitMap);  // De-allocate this file's 
 						//  data blocks
+
+#ifdef LOG_FS
+    void Deallocate();  // dellocate the data block of this file
+                        // in LFS, we just need to delete the file header
+                        // in inode map(file header map)
+#endif
 
     void FetchFrom(int sectorNumber); 	// Initialize file header from disk
     void WriteBack(int sectorNumber); 	// Write modifications to file header
@@ -100,7 +118,9 @@ class FileHeader {
 					// the byte
 
     int FileLength();			// Return the length of the file 
+    void SetFileLength(int len){ numBytes = len; }
 					// in bytes
+    int GetSectorNum(){ return numSectors; }
 
     void Print();			// Print the contents of the file.
 

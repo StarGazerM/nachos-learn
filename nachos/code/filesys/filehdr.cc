@@ -28,6 +28,7 @@
 #include "debug.h"
 #include "synchdisk.h"
 #include "main.h"
+#include <ctime>
 
 void 
 IndirectHeader::Deallocate(PersistentBitmap *freeMap)
@@ -54,6 +55,7 @@ IndirectHeader::WriteBack(int sector)
     kernel->synchDisk->WriteSector(sector, (char *)this); 
 }
 
+#ifndef LOG_FS
 int 
 IndirectHeader::ByteToSector(int offset, PersistentBitmap *freeMap)
 {
@@ -64,6 +66,13 @@ IndirectHeader::ByteToSector(int offset, PersistentBitmap *freeMap)
     }
     return dataSectors[offset];
 }
+#else
+int 
+IndirectHeader::ByteToSector(int offset)
+{
+    return dataSectors[offset];
+}
+#endif
 
 void
 DoubleIndirectHeader::Deallocate(PersistentBitmap *freeMap)
@@ -94,6 +103,7 @@ DoubleIndirectHeader::WriteBack(int sector)
     kernel->synchDisk->WriteSector(sector, (char *)this); 
 }
 
+#ifndef LOG_FS
 int
 DoubleIndirectHeader::ByteToSector(int offset, PersistentBitmap *freeMap)
 {
@@ -115,6 +125,20 @@ DoubleIndirectHeader::ByteToSector(int offset, PersistentBitmap *freeMap)
     delete idtmp;
     return ret;
 }
+#else
+int
+DoubleIndirectHeader::ByteToSector(int offset)
+{
+    int ret;
+    int indirectOff = offset / (NumData * SectorSize);
+    int directOff = (offset % (NumData * SectorSize)) / SectorSize;
+    IndirectHeader *idtmp = new IndirectHeader;
+    kernel->synchDisk->ReadSector(dataHeaders[indirectOff], (char *)idtmp);
+    ret = idtmp->ByteToSector(directOff);
+    delete idtmp;
+    return ret;
+}
+#endif
 
 FileHeader::FileHeader()
 {
@@ -132,7 +156,6 @@ FileHeader::FileHeader()
 void
 FileHeader::initAllData(PersistentBitmap *freeMap, int num)
 {
-    // TODO: change the allocation type here
     for(int i =0; i < NumIndirect; i++)
         indirects[i] = -1;
     doubleIndirect = -1;
@@ -220,6 +243,101 @@ FileHeader::Allocate(PersistentBitmap *freeMap, int fileSize)
     return TRUE;
 }
 
+#ifdef LOG_FS
+//----------------------------------------------------------------------
+// FileHeader::Allocate
+// 	Initialize a fresh file header for a empty file
+//  return flase if the disk is full 
+//----------------------------------------------------------------------
+bool
+FileHeader::Allocate()
+{
+    // TODO: need to check the status of disk, this can be acheved by check
+    // a varible in kernal( this can be created after system boot up)
+    numBytes = 0;
+    numSectors = 0;
+    for(int i =0; i < NumIndirect; i++)
+        indirects[i] = -1;
+    doubleIndirect = -1;
+}
+
+//----------------------------------------------------------------------
+// FileHeader::AppendOne
+// 	this will add empty sector to the end of the file
+//   meanwhile, if data in file header is changed
+//   we need to update the file header map
+//----------------------------------------------------------------------
+bool
+FileHeader::AppendOne(char* name, int sectorNum)
+{
+    numSectors++;
+    int version = std::time(nullptr);
+    if(numSectors < NumDirect)
+    {
+        dataSectors[numSectors] = sectorNum;
+        return true;
+    }
+    else if (numSectors < NumIndirect*NumData+NumDirect)
+    {
+        // in indirect data node
+        int indirectOff = (numSectors - NumDirect)/NumData;
+        int dataOffset = (numSectors - NumDirect)%NumData;
+        if(indirects[indirectOff] != -1)
+        {
+            IndirectHeader *idtmp = new IndirectHeader;
+            idtmp->FetchFrom(indirects[indirectOff]);
+            idtmp->dataSectors[dataOffset] = sectorNum;
+            idtmp->WriteBack(indirects[indirectOff]);
+        }
+        else
+        {
+            // TODO: check concurrence here
+            IndirectHeader *idtmp = new IndirectHeader;
+            int currentSeg = kernel->fileSystem->currentSeg;
+            DiskSegment *segptr = kernel->fileSystem->segTable[currentSeg];
+            // idtmp->dataSectors[0] = segptr->AllocateSector(name, version);
+            // char empty[SectorSize];
+            // kernel->synchDisk->WriteSector(idtmp->dataSectors[0], empty);
+            idtmp->dataSectors[0] = sectorNum;
+
+            // currentSeg may change
+            currentSeg = kernel->fileSystem->currentSeg;
+            segptr = kernel->fileSystem->segTable[currentSeg];
+            indirects[indirectOff] = segptr->AllocateSector(name, version);
+            idtmp->WriteBack(indirects[indirectOff]);
+
+            // currentSeg may change
+            currentSeg = kernel->fileSystem->currentSeg;
+            segptr = kernel->fileSystem->segTable[currentSeg];
+            // update file header
+            int newHdrSector = segptr->AllocateSector(name, version);
+            this->WriteBack(newHdrSector);
+        }
+        return true;
+    }
+
+    return true;
+    // in double indirect
+}
+//----------------------------------------------------------------------
+// FileHeader::Deallocate
+// 	This do not need to be implelemnt any more, fs will delete this header
+//  directly
+//
+// in LFS it is direct! because we are not actually marking the useful
+// block, our new create operation is done on an clean sector, this is
+// guaranteed by segment clean policy. If the file header is removed, 
+// the useless sector will be collected by cleaner. This is a cheap 
+// operation. We are not necessarily do anything
+//----------------------------------------------------------------------
+void
+FileHeader::Deallocate()
+{
+    // empty
+}
+
+#endif
+
 //----------------------------------------------------------------------
 // FileHeader::Deallocate
 // 	De-allocate all the space allocated for data blocks for this file.
@@ -304,10 +422,10 @@ FileHeader::WriteBack(int sector)
 // append of a file is not allowed!
 //----------------------------------------------------------------------
 
+#ifndef LOG_FS
 int
 FileHeader::ByteToSector(int offset)
 {
-    // TODO: change the allocation type here
     int ret;
     ASSERT(offset <= (numSectors + 1)*SectorSize)
     if(offset > numBytes)
@@ -375,6 +493,10 @@ FileHeader::ByteToSector(int offset)
             delete freeMap;
             return ret;
         }
+        else
+        {
+            dtmp->FetchFrom(doubleIndirect);
+        }
         // kernel->synchDisk->ReadSector(doubleIndirect, (char*)&dtmp);
         // int indirectOff = current / (NumData * SectorSize);
         // IndirectHeader idtmp;
@@ -389,6 +511,41 @@ FileHeader::ByteToSector(int offset)
     }
 }
 
+#else
+int
+FileHeader::ByteToSector(int offset)
+{
+    int ret;
+    ASSERT(offset <= numBytes)
+    if(offset < NumDirect*SectorSize)
+    {
+        ret = dataSectors[offset / SectorSize];
+        return ret;
+    }
+    int current = offset - NumDirect*SectorSize;
+    if(current < NumIndirect * NumData * SectorSize)
+    {
+        int indirectOff =  current / (NumData * SectorSize);
+        // read that indirect node form disk
+        IndirectHeader *idtmp = new IndirectHeader;
+        idtmp->FetchFrom(indirects[indirectOff]);
+        current = current % (NumData * SectorSize);
+        int directOff = current / SectorSize;
+        ret = idtmp->ByteToSector(directOff);
+        delete idtmp;
+        return ret;
+    }
+    else
+    {
+        current = current - NumIndirect * NumData * SectorSize;
+        DoubleIndirectHeader *dtmp = new DoubleIndirectHeader;
+        dtmp->FetchFrom(doubleIndirect);
+        ret = dtmp->ByteToSector(current);
+        delete dtmp;
+        return ret;
+    }
+}
+#endif
 //----------------------------------------------------------------------
 // FileHeader::FileLength
 // 	Return the number of bytes in the file.

@@ -16,7 +16,7 @@ class HdrInfo
 {
   public:
     HdrInfo(){};
-    HdrInfo(int fileHashCode, int logOffset);
+    HdrInfo(int fileHashCode, int version, int logOffset);
 
     int last_access;
     int fileHashCode;
@@ -32,10 +32,11 @@ class FileHdrMap
 
   public:
     FileHdrMap(){};
-    int FindFileHeader(char* name) throw (std::out_of_range);                      // get the sector number of a file by it's name        
-    void UpdateFileHdr(int fileHashCode, int logOffset); // add or update the position of
+    int FindFileHeader(char* name) throw (std::out_of_range);                      // get the sector number of a file by it's name     
+    void UpdateFileHdr(char* name, int version,int logOffset); // add or update the position of
                                                       // an file header
-    bool DeleteFileHdr(int fileHashCode);               // delete an entry in map
+    void FileContentModified(char* name, int version);  // this will update the version of a file 
+    bool DeleteFileHdr(char* name);               // delete an entry in map
     std::vector<HdrInfo>& GetAllEntries(){ return fileHdrs; } 
     void SetAllEntires(std::vector<HdrInfo>& entires){ fileHdrs = entires;};
     void ClearAll();

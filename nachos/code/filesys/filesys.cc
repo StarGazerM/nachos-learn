@@ -53,6 +53,7 @@
 #include "filesys.h"
 #include "synchdisk.h"
 #include "main.h"
+#include <ctime>
 
 // Sectors containing the file headers for the bitmap of free sectors,
 // and the directory of files.  These file headers are placed in well-known 
@@ -69,6 +70,7 @@
 
 //----------------------------------------------------------------------
 // FileSystem::FileSystem
+//  NOTE: before use a disk, format it first! 
 // 	Initialize the file system.  If format = TRUE, the disk has
 //	nothing on it, and we need to initialize the disk to contain
 //	an empty directory, and a bitmap of free sectors (with almost but
@@ -85,6 +87,7 @@ FileSystem::FileSystem(bool format)
     DEBUG(dbgFile, "Initializing the file system.");
     if (format)
     {
+    #ifndef LOG_FS
         PersistentBitmap *freeMap = new PersistentBitmap(NumSectors);
         Directory *directory = new Directory(NumDirEntries);
         FileHeader *mapHdr = new FileHeader;
@@ -138,16 +141,31 @@ FileSystem::FileSystem(bool format)
         delete directory;
         delete mapHdr;
         delete dirHdr;
+    #else
+        fileHrdMap = new FileHdrMap;
+        // init all segment
+        // TODO: if possible change to RAII style
+        for(int i= 0; i < NumSeg; i++)
+        {
+            // calculate the start sector of each segment
+            segTable[i] = new DiskSegment(i*SegSize + DataSegStart);
+        }
+        SaveToCheckPoint();
+    #endif
     }
     else
     {
         // if we are not formatting the disk, just open the files representing
         // the bitmap and directory; these are left open while Nachos is running
+    #ifndef LOG_FS
         freeMapFile = new OpenFile(FreeMapSector);
         directoryFile = new OpenFile(DirectorySector);
+    #else
 
         // if not format restore fileheader map and segment table from checkpoint
-        fileHrdMap = new FileHdrMap();
+        fileHrdMap = new FileHdrMap;
+        RestoreFromCheckPoint();
+    #endif
     }
 }
 
@@ -225,6 +243,31 @@ FileSystem::Create(char *name, int initialSize)
     return success;
 }
 
+#ifdef LOG_FS
+//---------------------------------------------------------------------
+/// Create a file whose inital size zero, in another word, this will only
+//  1. create a file header
+//  2. change segment usage table( in current desgin, which means segment 
+//     summary, will be changed  at the same time).
+//  3. write to cache disk
+//  4. add it into file header map
+//---------------------------------------------------------------------
+bool
+FileSystem::Create(char* name)
+{
+    //TODO: check whether the file is already exist
+    FileHeader *hdr = new FileHeader;
+    // change segment info
+    DiskSegment *segptr = segTable[currentSeg];
+    int version = std::time(nullptr);
+    int newSector = segptr->AllocateSector(name, version);
+    hdr->WriteBack(newSector);
+    // add into file header map
+    fileHrdMap->UpdateFileHdr(name, version, newSector);
+}
+
+#endif
+
 //----------------------------------------------------------------------
 // FileSystem::Open
 // 	Open a file for reading and writing.  
@@ -292,6 +335,7 @@ FileSystem::Open(char *name)
 //	"name" -- the text name of the file to be removed
 //----------------------------------------------------------------------
 
+#ifndef LOG_FS
 bool
 FileSystem::Remove(char *name)
 { 
@@ -324,6 +368,18 @@ FileSystem::Remove(char *name)
     return TRUE;
 } 
 
+#else
+//----------------------------------------------------------------------
+// FileSystem::Remove
+// 	In LFS, we just need to remove it from our inode map( file header map)
+//----------------------------------------------------------------------
+bool
+FileSystem::Remove(char *name)
+{
+    fileHrdMap->DeleteFileHdr(name);
+}
+
+#endif
 //----------------------------------------------------------------------
 // FileSystem::List
 // 	List all the files in the file system directory.

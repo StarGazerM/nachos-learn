@@ -83,6 +83,11 @@ class OpenFile {
 					// bypassing the implicit position.
     int WriteAt(char *from, int numBytes, int position);
 
+#ifdef LOG_FS
+		int AppendOneSector(char * from, int numBytes);
+							// append data to the end of the file
+#endif
+
     int Length(); 			// Return the number of bytes in the
 					// file (this interface is simpler 
 					// than the UNIX idiom -- lseek to 

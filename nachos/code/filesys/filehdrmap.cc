@@ -2,11 +2,11 @@
 #include <ctime>
 #include <functional>
 
-HdrInfo::HdrInfo(int fileHashCode, int logOffset)
+HdrInfo::HdrInfo(int fileHashCode, int version, int logOffset)
 {
     this->fileHashCode = fileHashCode;
     this->logOffset =  logOffset;
-    this->last_access = std::time(nullptr);
+    this->last_access = version;
 }
 
 bool HdrInfo::operator==(const HdrInfo &other)
@@ -14,23 +14,53 @@ bool HdrInfo::operator==(const HdrInfo &other)
     return (fileHashCode==other.fileHashCode);
 }
 
-void FileHdrMap::UpdateFileHdr(int fileHashCode, int logOffset)
+
+//--------------------------------------------------------------------
+// FileHdrMap::UpdateFileHdr
+//  add or update a file header, this should be called after a log is
+//  the version of this file need to be provided
+//  this should be called when a file header itself is changed
+//  created on cache or disk
+//--------------------------------------------------------------------
+void FileHdrMap::UpdateFileHdr(char* name, int version, int logOffset)
 {
-    for(auto info :  fileHdrs)
+    std::hash<std::string> hash_fn;
+    int fileHashCode = hash_fn(std::string(name));
+    for(auto info : fileHdrs)
     {
         if(info.fileHashCode == fileHashCode)
         {
             info.logOffset = logOffset;
-            info.last_access = std::time(nullptr);
+            info.last_access = version;
             return;
         }
     }
-    fileHdrs.push_back(HdrInfo(fileHashCode, logOffset));
+    fileHdrs.push_back(HdrInfo(fileHashCode, version, logOffset));
     return;
 }
-
-bool FileHdrMap::DeleteFileHdr(int fileHashCode)
+//--------------------------------------------------------------------
+// FileHdrMap::FileContentModified
+//  when a file  content is modified, the timestamp of it's summary 
+//  need to be updated  
+//--------------------------------------------------------------------
+void FileHdrMap::FileContentModified(char* name, int version)
 {
+    std::hash<std::string> hash_fn;
+    int fileHashCode = hash_fn(std::string(name));
+    for(auto info : fileHdrs)
+    {
+        if(info.fileHashCode == fileHashCode)
+        {
+            info.last_access = version;
+            return;
+        }
+    }
+}
+
+bool FileHdrMap::DeleteFileHdr(char* name)
+{
+    std::hash<std::string> hash_fn;
+    int fileHashCode = hash_fn(std::string(name));
     for(auto it = fileHdrs.begin(); it != fileHdrs.end();)
     {
         if((*it).fileHashCode == fileHashCode)
@@ -52,10 +82,10 @@ int FileHdrMap::FindFileHeader(char* name) throw (std::out_of_range)
     // to save in disk
     int sector = -1;
     std::hash<std::string> hash_fn;
-    int nameHash = hash_fn(std::string(name));
+    int fileHashCode = hash_fn(std::string(name));
     for(auto fd : fileHdrs)
     {
-        if(nameHash == fd.fileHashCode)
+        if(fileHashCode == fd.fileHashCode)
         {
             sector = fd.fileHashCode;
             break;

@@ -17,6 +17,7 @@
 #define SegSize 16
 #define NumSeg 63
 #define NumDataSeg 15
+#define DataSegStart 16       // 16 is the first data segment
 
 // the summary need to keep track for every live sector in segment
 class SummaryEntry
@@ -47,14 +48,18 @@ class DiskSegment
     int NumAlive();
     bool IsClean();
     bool IsFull();
-    bool Write(int len, char *data, int fileNameHash); // write a sector into segment. this kind of 
-                                                      // write will cause a real disk io
+    int AllocateSector(char* name, int version)throw(std::overflow_error);          
+                                      // alloacte a sector to a file 
+    bool Write(int len, char *data); // write a sector into segment. this kind of 
+                                    // write will cause a real disk io
     SegmentSummary &GetSummay() { return summary; }
     Bitmap *GetUsage() { return usageTable; }
     void SetEnd(int end) { this->end = end; }
     int GetEnd() { return end; }
     int SetBegin(int begin) { this->begin = begin; }
     int GetBegin() { return begin; }
+
+    ~DiskSegment(){ delete usageTable; }
 
   private:
     int begin;              // the start offset of this segment. real segnumber in
@@ -63,6 +68,7 @@ class DiskSegment
     SegmentSummary summary; // all summary is stored in the first sector in segment
     Bitmap *usageTable;     // usagtable in each seg will be saved together in an special sector
                             // in reserved sector
+                            // TODO: overload copy control!
 };
 
 #endif

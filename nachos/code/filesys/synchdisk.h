@@ -105,12 +105,18 @@ class IDiskDecorator :  public IDisk
 class WithLogCache : public IDiskDecorator
 {
   private:
-    LogCache *cache;
+    LogCache *write_cache;
+    ReadCache *read_cache;
   public:
     WithLogCache(IDisk *disk);
     void ReadSector(int sectorNumber, char* data);
     void WriteSector(int sectorNumber, char* data);
     // void CallBack();
+    // some other disk associated operation
+    // casue now all of our file header need to be
+    // recorded in seprerated space on disk, this 
+    // can be done in this decorator
+    int AddFileHdr(FileHeader* hdr);
     ~WithLogCache();
 };
 

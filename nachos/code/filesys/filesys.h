@@ -78,6 +78,9 @@ class FileSystem {
 
     bool Create(char *name, int initialSize);  	
 					// Create a file (UNIX creat)
+#ifdef LOG_FS
+	bool Create(char* name);	// create a file with size zero
+#endif
 
     OpenFile* Open(char *name); 	// Open a file (UNIX open)
  
@@ -96,6 +99,7 @@ class FileSystem {
 									// 2. the number of sector over thredhold(5) will be cleaned
 									// 3. the segment with less live data will be cleaned
 									// 4. the data from some file will be put together, when rewrite happen
+	FileHdrMap* GetFileHdrMap(){ return fileHrdMap; }
 	std::array<DiskSegment*, NumSeg> segTable;		// segment usage table
 	
 	int currentSeg;
@@ -106,7 +110,6 @@ class FileSystem {
    OpenFile* directoryFile;		// "Root" directory -- list of 
 					// file names, represented as a file
 
-	// TODO: Refector these to file on ramdisk
 	FileHdrMap *fileHrdMap;						// inode map	
 };
 

@@ -100,32 +100,38 @@ IDiskDecorator::~IDiskDecorator()
 
 WithLogCache::WithLogCache(IDisk *disk):IDiskDecorator(disk)
 {
-    cache = new LogCache();
+    write_cache = new LogCache;
+    read_cache = new ReadCache;
 }
 
 void WithLogCache::ReadSector(int sectorNumber, char* data)
 {
     try
     {
-        cache->Read(sectorNumber, data);
+        read_cache->Read(sectorNumber, data);
     }
     catch(const std::out_of_range& e)
     {
         // handle cache miss here, dirctely read from disk
+        // and the add data to cache
         IDiskDecorator::ReadSector(sectorNumber, data);
+        read_cache->UpdateOrAdd(sectorNumber, data);
     }
     
 }
 
 void WithLogCache::WriteSector(int sectorNumber, char* data)
 {
+    // TODO: plz check whether file name is realy useful.....
     char* name = kernel->currentThread->GetCurrentFD()->GetFileName();
     std::hash<std::string> hash_fn;
     int nameHash = hash_fn(std::string(name));
-    cache->Append(sectorNumber, data, nameHash, _disk);
+    write_cache->Append(sectorNumber, data, nameHash, _disk);
+    read_cache->UpdateOrAdd(sectorNumber, data);
 }
 
 WithLogCache::~WithLogCache()
 {
-    delete  cache;
+    delete  write_cache;
+    delete read_cache;
 }

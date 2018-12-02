@@ -17,7 +17,8 @@
 #include <vector>
 #include <map>
 #include <exception>
-#include "disk.h"
+// #include "synchdisk.h"
+class IDisk;
 
 // buffer size is two sector
 #define BUFFER_SIZE 2 * SectorSize * 16
@@ -25,6 +26,8 @@
 using SectorArray = std::array<char, SectorSize>;
 using NameHashCode = int; 
 
+// log cache is use for write operation
+// and this will persist to disk
 class LogCache
 {
 private:
@@ -39,13 +42,34 @@ private:
 public:
   LogCache();
   void Read(int sectorNum, char* dest) throw(std::out_of_range); // read a sector from cache
-  void Append(int sectorNum, char *data, NameHashCode filename, IDisk *disk);
+  int Append(int sectorNum, char *data, NameHashCode filename, IDisk *disk);
   void Persist(IDisk *disk); // save all data in memory into disk
                   // it will be triggered if buffer is full
                   // or system shutdown
                   // this will not clear all data in buffer
                   // only dirty counter will be affected here
   void Flush(IDisk *disk);   // save all data and then clean!
+};
+
+// this is the cache for reading
+// every read operation will bring some sector to 
+// cache. the size of this buffer is as same as write buffer
+// NOTE: write operation should also update the buffer here 
+class ReadCache
+{
+  private:
+    int cursor;       // end of current read buffer, if buffer is
+                      // full this will cause overwrite
+    std::map<int, SectorArray> buffer;  // the key in buffer is the sector number
+                                        // and the value is the data, I use char array
+                                        // to store the value because a value type
+                                        // is easy for memory management, copy and
+                                        // store cstring is hard.
+  public:
+    void UpdateOrAdd(int sec, char* data);  // add or update a block in ReadCache
+    void Read(int sec, char* dest)throw(std::out_of_range);         
+                                            // read data from a sector in cache, if
+                                            // cache miss an error will be thrown
 };
 
 #endif
