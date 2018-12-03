@@ -48,6 +48,7 @@ class DiskSegment
     int NumAlive();
     bool IsClean();
     bool IsFull();
+    void Clear();   // delete all data on this segment
     int AllocateSector(char* name, int version)throw(std::overflow_error);
     int AllocateSector(int nameHash, int version)throw(std::overflow_error);            
                                       // alloacte a sector to a file 

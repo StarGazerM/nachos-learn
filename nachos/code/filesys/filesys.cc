@@ -590,9 +590,6 @@ void FileSystem::CleanSegments()
         // read data out
         char datatmp[SectorSize];
         kernel->synchDisk->ReadSector(originalSec, datatmp);
-        // write data
-        int newSec = (*cleanSeg)->AllocateSector(fileName, version);
-        (*cleanSeg)->Write(SectorSize, datatmp);
         // update file hdr map, the write back of file header should be done at last
         int origanlHdrSec;
         try
@@ -602,11 +599,17 @@ void FileSystem::CleanSegments()
             FileHeader *hdr = new FileHeader;
             hdr->FetchFrom(originalSec);
             // FIXME: Modify a sector number in a filehdr, this is extremely hard
+            // NOTE: I am not using write at, because we want a really "clean" seg
+            // to write on, not just not full
+            // write data
+            int newSec = (*cleanSeg)->AllocateSector(fileName, version);
+            (*cleanSeg)->Write(SectorSize, datatmp);
+            hdr->UpdateSectorNum(origanlHdrSec*SectorSize, newSec, fileName);
             hdrBuf[hdr] = p.second;
         }
         catch(const exception &e)
         {
-            // this happened when file is deleted
+            // it happens when file is deleted
         }
     }
 
@@ -617,6 +620,12 @@ void FileSystem::CleanSegments()
                                                         , it.second.last_access);
         it.first->WriteBack(newSec);
         fileHrdMap->UpdateFileHdr(it.second.fileHashCode, it.second.last_access,newSec);
+    }
+
+    // finally release original segment
+    for(auto segptr : to_be_clean)
+    {
+        segptr->Clear();
     }
 }
 

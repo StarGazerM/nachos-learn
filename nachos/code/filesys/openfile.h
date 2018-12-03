@@ -86,6 +86,7 @@ class OpenFile {
 #ifdef LOG_FS
 		int AppendOneSector(char * from, int numBytes);
 							// append data to the end of the file
+		// int UpdateOneSector(int sector, )
 #endif
 
     int Length(); 			// Return the number of bytes in the

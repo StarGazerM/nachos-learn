@@ -119,6 +119,7 @@ int OpenFile::Write(char *into, int numBytes)
 
 int OpenFile::ReadAt(char *into, int numBytes, int position)
 {
+    kernel->currentThread->SetCurrentFD(this);
     int fileLength = hdr->FileLength();
     int i, firstSector, lastSector, numSectors;
     char *buf;
@@ -224,10 +225,15 @@ int OpenFile::WriteAt(char *from, int numBytes, int position)
 // if you want to add content to a file, use Append instead
 int OpenFile::WriteAt(char *from, int numBytes, int position)
 {
+    kernel->currentThread->SetCurrentFD(this);
     int fileLength = hdr->FileLength();
     int i, firstSector, lastSector, numSectors;
     bool firstAligned, lastAligned;
     char *buf;
+    int segNum;
+    DiskSegment* seg;
+    std::hash<std::string> hash_fn;
+    int fileHashCode = hash_fn(std::string(fileName));
 
     firstSector = divRoundDown(position, SectorSize);
     lastSector = divRoundDown(position + numBytes - 1, SectorSize);
@@ -250,17 +256,22 @@ int OpenFile::WriteAt(char *from, int numBytes, int position)
     int version = std::time(nullptr);
     for (i = 0; i <= lastSector * SectorSize; i += SectorSize)
     {
-        // FIXME: write operation should on new block
-        // meanwhile, original block need be set to dead on
-        // usage table
+        // FIXME: version here would be miss match!
         // kernel->synchDisk->WriteSector(hdr->ByteToSector(i),
         //                                &buf[i]); 
-        int segNum = kernel->fileSystem->currentSeg;
-        DiskSegment* seg = kernel->fileSystem->segTable[segNum];
-        seg->AllocateSector(fileName, version);
+        segNum = kernel->fileSystem->currentSeg;
+        seg = kernel->fileSystem->segTable[segNum];
+        int newSector = seg->AllocateSector(fileName, version);
+        // we need to know which position we have modified
+        hdr->UpdateSectorNum(i, newSector, fileHashCode);
         seg->Write(SectorSize, &buf[i]);
     }
-    kernel->fileSystem->GetFileHdrMap()->FileContentModified(fileName, version);
+    // write back changed file header
+    segNum = kernel->fileSystem->currentSeg;
+    seg = kernel->fileSystem->segTable[segNum];
+    int newHdrSec = seg->AllocateSector(fileName, version);
+    hdr->WriteBack(newHdrSec);
+    kernel->fileSystem->GetFileHdrMap()->UpdateFileHdr(fileName, version, newHdrSec);
     delete[] buf;
     return numBytes;
 }
@@ -287,6 +298,7 @@ int OpenFile::Length()
 //--------------------------------------------------------
 int OpenFile::AppendOneSector(char *from, int numBytes)
 {
+    kernel->currentThread->SetCurrentFD(this);
     int fileLength = hdr->FileLength(); 
     int numSectors = hdr->GetSectorNum();
     if(numBytes > SectorSize)
@@ -300,6 +312,7 @@ int OpenFile::AppendOneSector(char *from, int numBytes)
         DiskSegment *segptr = kernel->fileSystem->segTable[currentSeg];
         int newSector = segptr->AllocateSector(fileName, std::time(nullptr));
         char empty[SectorSize]; // initial the new allocated sector with empty content
+                                // TODO: this should be optimized
         kernel->synchDisk->WriteSector(newSector, empty);
         hdr->AppendOne(fileName, newSector);
     }

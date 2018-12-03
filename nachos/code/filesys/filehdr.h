@@ -62,6 +62,7 @@ class IndirectHeader
     void Deallocate(PersistentBitmap *freeMap);
     void FetchFrom(int sectorNumber); 	
     void WriteBack(int sectorNumber);
+    void UpdateSectorNum(int offset, int newSector, int nameHash);  
 #ifndef LOG_FS 	
     int ByteToSector(int offset, PersistentBitmap *freeMap);
 #else
@@ -83,6 +84,7 @@ class DoubleIndirectHeader
     void Deallocate(PersistentBitmap *freeMap);
     void FetchFrom(int sectorNumber); 	
     void WriteBack(int sectorNumber);
+    void UpdateSectorNum(int offset, int newSector, int hash);  
 #ifndef LOG_FS 	
     int ByteToSector(int offset, PersistentBitmap *freeMap);
 #else
@@ -116,6 +118,11 @@ class FileHeader {
     int ByteToSector(int offset);	// Convert a byte offset into the file
 					// to the disk sector containing
 					// the byte
+    void UpdateSectorNum(int offset, int newSector, int nameHash); 
+                    // this will point a origanls sector in file into
+                    // another sector, this operation need to be carefull.
+                    // cause the correctness is not ensured in function itself
+                    // it may also useful in COW
 
     int FileLength();			// Return the length of the file 
     void SetFileLength(int len){ numBytes = len; }

@@ -55,6 +55,12 @@ IndirectHeader::WriteBack(int sector)
     kernel->synchDisk->WriteSector(sector, (char *)this); 
 }
 
+void
+IndirectHeader::UpdateSectorNum(int offset, int newSector, int nameHash)
+{
+    dataSectors[offset] = newSector;
+}
+
 #ifndef LOG_FS
 int 
 IndirectHeader::ByteToSector(int offset, PersistentBitmap *freeMap)
@@ -546,6 +552,53 @@ FileHeader::ByteToSector(int offset)
     }
 }
 #endif
+
+//----------------------------------------------------------------------
+// FileHeader::UpdateSectorNum
+// 	this is a function work as 'mmap' in unix, this should be more and
+//  more careful in use
+//  work of this function is similar to 'byte to sector'
+//----------------------------------------------------------------------
+void
+FileHeader::UpdateSectorNum(int offset, int newSector, int nameHash)
+{
+    // first of all find that sector
+    int originalSec;
+    ASSERT(offset <= numBytes)
+    if(offset < NumDirect*SectorSize)
+    {
+        // originalSec = dataSectors[offset / SectorSize];
+        dataSectors[offset / SectorSize] = newSector;
+    }
+    int current = offset - NumDirect*SectorSize;
+    if(current < NumIndirect * NumData * SectorSize)
+    {
+        int indirectOff =  current / (NumData * SectorSize);
+        // read that indirect node form disk
+        IndirectHeader *idtmp = new IndirectHeader;
+        idtmp->FetchFrom(indirects[indirectOff]);
+        current = current % (NumData * SectorSize);
+        int directOff = current / SectorSize;
+        idtmp->UpdateSectorNum(directOff, newSector, nameHash);
+        // write itself back
+        // first allocate new sector for this indirecr node
+        int currentSegNum = kernel->fileSystem->currentSeg;
+        DiskSegment *seg = kernel->fileSystem->segTable[currentSegNum];
+        int newIndirectSecNum = seg->AllocateSector(nameHash, std::time(nullptr));
+        idtmp->WriteBack(newIndirectSecNum);
+        delete idtmp;
+    }
+    else
+    {
+        // FIXME: not implement yet!!
+        current = current - NumIndirect * NumData * SectorSize;
+        DoubleIndirectHeader *dtmp = new DoubleIndirectHeader;
+        dtmp->FetchFrom(doubleIndirect);
+        originalSec = dtmp->ByteToSector(current);
+        delete dtmp;
+    }
+}
+
 //----------------------------------------------------------------------
 // FileHeader::FileLength
 // 	Return the number of bytes in the file.

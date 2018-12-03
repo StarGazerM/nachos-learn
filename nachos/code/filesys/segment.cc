@@ -78,3 +78,15 @@ bool DiskSegment::Write(int len, char* data)
         currentData +=  SectorSize;
     }
 }
+//-----------------------------------------------------------
+// DiskSegment::Clear
+//  clear a segment means clear it usage table, marks every 
+//  sector clean
+//---------------------------------------------------------
+void DiskSegment::Clear()
+{
+    for(int i = 0; i < usageTable->GetNumBits(); i++)
+    {
+        usageTable->Clear(i);
+    }
+}

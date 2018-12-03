@@ -48,6 +48,7 @@ class Bitmap {
     void SelfTest();		// Test whether bitmap is working
 
     unsigned int *GetBits(){ return map; }
+    int GetNumBits(){ return numBits; }
     void SetBits(unsigned int *bits){ map = bits; };
     int GetNumWords(){ return numWords;}
     
