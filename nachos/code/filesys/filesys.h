@@ -92,25 +92,27 @@ class FileSystem {
 
 	OpenFile* GetFreeMap(){ return freeMapFile; };
 
+#ifdef LOG_FS
 	void SaveToCheckPoint();	// save FileHeaderMap, SegTable to check point region on disk
 	void RestoreFromCheckPoint();	// restore maps from check point
 	void CleanSegments();			// run segment clean
-									// 1. this will be evoked when clean segment is less than 5 segement
-									// 2. the number of sector over thredhold(5) will be cleaned
+									// 1. this will be evoked when clean segment is less than 20 segement
+									// 2. the number of sector over thredhold will be cleaned
 									// 3. the segment with less live data will be cleaned
 									// 4. the data from some file will be put together, when rewrite happen
 	FileHdrMap* GetFileHdrMap(){ return fileHrdMap; }
 	std::array<DiskSegment*, NumSeg> segTable;		// segment usage table
-	
 	int currentSeg;
+#endif
 
   private:
    OpenFile* freeMapFile;		// Bit map of free disk blocks,
 					// represented as a file
    OpenFile* directoryFile;		// "Root" directory -- list of 
 					// file names, represented as a file
-
+#ifdef LOG_FS
 	FileHdrMap *fileHrdMap;						// inode map	
+#endif
 };
 
 #endif // FILESYS

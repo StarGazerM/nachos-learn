@@ -48,7 +48,8 @@ class DiskSegment
     int NumAlive();
     bool IsClean();
     bool IsFull();
-    int AllocateSector(char* name, int version)throw(std::overflow_error);          
+    int AllocateSector(char* name, int version)throw(std::overflow_error);
+    int AllocateSector(int nameHash, int version)throw(std::overflow_error);            
                                       // alloacte a sector to a file 
     bool Write(int len, char *data); // write a sector into segment. this kind of 
                                     // write will cause a real disk io
@@ -68,7 +69,7 @@ class DiskSegment
     SegmentSummary summary; // all summary is stored in the first sector in segment
     Bitmap *usageTable;     // usagtable in each seg will be saved together in an special sector
                             // in reserved sector
-                            // TODO: overload copy control!
+                            // TODO: when a file is written this need to be clear
 };
 
 #endif

@@ -120,6 +120,7 @@ class WithLogCache : public IDiskDecorator
     // recorded in seprerated space on disk, this 
     // can be done in this decorator
     int AddFileHdr(FileHeader* hdr);
+    void Flush();    // flush the cache to physical disk
     ~WithLogCache();
 };
 

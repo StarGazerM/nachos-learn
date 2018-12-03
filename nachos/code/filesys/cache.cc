@@ -149,3 +149,8 @@ void ReadCache::UpdateOrAdd(int sec, char* data)
     }
     buffer[sec] = in_buf;
 }
+
+void ReadCache::Clear()
+{
+    buffer.clear();
+}

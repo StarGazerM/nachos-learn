@@ -69,6 +69,7 @@ class ReadCache
     void Read(int sec, char* dest)throw(std::out_of_range);         
                                             // read data from a sector in cache, if
                                             // cache miss an error will be thrown
+    void Clear();                           // clear all data on read cache
 };
 
 #endif

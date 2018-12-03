@@ -54,6 +54,7 @@
 #include "synchdisk.h"
 #include "main.h"
 #include <ctime>
+#include <set>
 
 // Sectors containing the file headers for the bitmap of free sectors,
 // and the directory of files.  These file headers are placed in well-known 
@@ -538,6 +539,85 @@ void FileSystem::RestoreFromCheckPoint()
 
     delete hdrbuf;
     delete hdrcheckp;
+}
+
+//--------------------------------------------------
+// FileSystem::CleanSegments
+//--------------------------------------------------
+void FileSystem::CleanSegments()
+{
+    // check whether condition is satisfied
+    int cleanNum = std::count_if(segTable.begin(), segTable.end()
+                        , [](DiskSegment* sptr){ sptr->IsClean();});
+    if(cleanNum > 20)
+        return;
+
+    std::vector<DiskSegment*> to_be_clean;
+    // need clean
+    // find the segment need to be clean
+    auto it = segTable.begin();
+    for(int i = 0; i < (20-cleanNum); i++)
+    {
+        it = std::find_if_not(it, segTable.end()
+                        , [](DiskSegment* sptr){ sptr->IsClean();});
+        to_be_clean.push_back(*it);
+    }
+    // collect all live data
+    std::map<int, SummaryEntry> live_sec;
+    for(auto sptr : to_be_clean)
+    {
+        Bitmap * usageMap = sptr->GetUsage();
+        for(int i = 0; i < NumDataSeg; i++)
+        {
+            if(usageMap->Test(i))
+            {
+                // SummaryEntry s = (sptr->GetSummay())[i];
+                live_sec[sptr->GetBegin()+1]= (sptr->GetSummay())[i];
+            }
+        }
+    }
+
+    // rewrite all these data to empty segment and update file header map
+    std::map<FileHeader*, SummaryEntry> hdrBuf;   // use ptr ....it is bad idea but the stack size is percious
+    for(auto p : live_sec)
+    {
+        int originalSec = p.first;
+        int fileName = p.second.fileHashCode;
+        int version = p.second.last_access;
+        // find a clean segment
+        auto cleanSeg = std::find_if(segTable.begin(), segTable.end()
+                        , [](DiskSegment* sptr){ sptr->IsClean();});
+        // read data out
+        char datatmp[SectorSize];
+        kernel->synchDisk->ReadSector(originalSec, datatmp);
+        // write data
+        int newSec = (*cleanSeg)->AllocateSector(fileName, version);
+        (*cleanSeg)->Write(SectorSize, datatmp);
+        // update file hdr map, the write back of file header should be done at last
+        int origanlHdrSec;
+        try
+        {
+            origanlHdrSec = fileHrdMap->FindFileHeader(fileName);
+            // read file hdr out
+            FileHeader *hdr = new FileHeader;
+            hdr->FetchFrom(originalSec);
+            // FIXME: Modify a sector number in a filehdr, this is extremely hard
+            hdrBuf[hdr] = p.second;
+        }
+        catch(const exception &e)
+        {
+            // this happened when file is deleted
+        }
+    }
+
+    // write back file header
+    for(auto it : hdrBuf)
+    {
+        int newSec = segTable[currentSeg]->AllocateSector(it.second.fileHashCode
+                                                        , it.second.last_access);
+        it.first->WriteBack(newSec);
+        fileHrdMap->UpdateFileHdr(it.second.fileHashCode, it.second.last_access,newSec);
+    }
 }
 
 #endif // FILESYS_STUB

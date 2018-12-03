@@ -131,6 +131,12 @@ void WithLogCache::WriteSector(int sectorNumber, char* data)
     read_cache->UpdateOrAdd(sectorNumber, data);
 }
 
+void WithLogCache::Flush()
+{
+    write_cache->Persist(_disk);
+    read_cache->Clear();
+}
+
 WithLogCache::~WithLogCache()
 {
     delete  write_cache;

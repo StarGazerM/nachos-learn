@@ -250,8 +250,15 @@ int OpenFile::WriteAt(char *from, int numBytes, int position)
     int version = std::time(nullptr);
     for (i = 0; i <= lastSector * SectorSize; i += SectorSize)
     {
-        kernel->synchDisk->WriteSector(hdr->ByteToSector(i),
-                                       &buf[i]); 
+        // FIXME: write operation should on new block
+        // meanwhile, original block need be set to dead on
+        // usage table
+        // kernel->synchDisk->WriteSector(hdr->ByteToSector(i),
+        //                                &buf[i]); 
+        int segNum = kernel->fileSystem->currentSeg;
+        DiskSegment* seg = kernel->fileSystem->segTable[segNum];
+        seg->AllocateSector(fileName, version);
+        seg->Write(SectorSize, &buf[i]);
     }
     kernel->fileSystem->GetFileHdrMap()->FileContentModified(fileName, version);
     delete[] buf;

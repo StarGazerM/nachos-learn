@@ -48,11 +48,23 @@ int DiskSegment::AllocateSector(char* name, int version)throw(std::overflow_erro
     return end;
 }
 
+int DiskSegment::AllocateSector(int nameHash, int version)throw(std::overflow_error)
+{
+    if(IsFull())
+        throw std::overflow_error("this segment is full!");
+    // change usageTable
+    end++;
+    usageTable->Mark(end);
+    summary[end] =  SummaryEntry(version, nameHash);
+    return end;
+}
+
 //-----------------------------------------------------------
 // DiskSegment::Write
 //   this kind of write is just write a sector to disk, 
 //   plz note that, the correct of this  block is not guaranteed 
 //   here!
+//   TODO: merge allocate logic in this write operation
 //---------------------------------------------------------
 bool DiskSegment::Write(int len, char* data)
 {

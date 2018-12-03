@@ -38,6 +38,20 @@ void FileHdrMap::UpdateFileHdr(char* name, int version, int logOffset)
     fileHdrs.push_back(HdrInfo(fileHashCode, version, logOffset));
     return;
 }
+void FileHdrMap::UpdateFileHdr(int fileHashCode, int version, int logOffset)
+{;
+    for(auto info : fileHdrs)
+    {
+        if(info.fileHashCode == fileHashCode)
+        {
+            info.logOffset = logOffset;
+            info.last_access = version;
+            return;
+        }
+    }
+    fileHdrs.push_back(HdrInfo(fileHashCode, version, logOffset));
+    return;
+}
 //--------------------------------------------------------------------
 // FileHdrMap::FileContentModified
 //  when a file  content is modified, the timestamp of it's summary 
@@ -96,3 +110,23 @@ int FileHdrMap::FindFileHeader(char* name) throw (std::out_of_range)
     
     return sector;
 }
+
+int FileHdrMap::FindFileHeader(int nameHash) throw (std::out_of_range)
+{
+    // calculate the hash code of file name, which is more easy
+    // to save in disk
+    int sector = -1;
+    for(auto fd : fileHdrs)
+    {
+        if(nameHash == fd.fileHashCode)
+        {
+            sector = fd.fileHashCode;
+            break;
+        }
+    }
+    if( sector == -1)
+        throw std::out_of_range("file header is not in range!");
+    
+    return sector;
+}
+

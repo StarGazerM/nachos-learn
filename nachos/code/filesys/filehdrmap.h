@@ -32,9 +32,11 @@ class FileHdrMap
 
   public:
     FileHdrMap(){};
-    int FindFileHeader(char* name) throw (std::out_of_range);                      // get the sector number of a file by it's name     
+    int FindFileHeader(char* name) throw (std::out_of_range);  // get the sector number of a file by it's name     
+    int FindFileHeader(int nameHash) throw (std::out_of_range);  
     void UpdateFileHdr(char* name, int version,int logOffset); // add or update the position of
                                                       // an file header
+    void UpdateFileHdr(int fileHashCode, int version, int logOffset);
     void FileContentModified(char* name, int version);  // this will update the version of a file 
     bool DeleteFileHdr(char* name);               // delete an entry in map
     std::vector<HdrInfo>& GetAllEntries(){ return fileHdrs; } 
