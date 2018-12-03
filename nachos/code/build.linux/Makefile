@@ -191,7 +191,7 @@
 # of "-DSIM_FIX" to the DEFINES.  This should be enabled by default
 # and eventually will not require the symbol definition
 ################################################################
-DEFINES = -LOG_FS -DRDATA -DSIM_FIX
+DEFINES = -DLOG_FS -DRDATA -DSIM_FIX
 
 
 #####################################################################

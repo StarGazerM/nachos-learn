@@ -118,11 +118,13 @@ class FileHeader {
     int ByteToSector(int offset);	// Convert a byte offset into the file
 					// to the disk sector containing
 					// the byte
+#ifdef LOG_FS
     void UpdateSectorNum(int offset, int newSector, int nameHash); 
                     // this will point a origanls sector in file into
                     // another sector, this operation need to be carefull.
                     // cause the correctness is not ensured in function itself
                     // it may also useful in COW
+#endif
 
     int FileLength();			// Return the length of the file 
     void SetFileLength(int len){ numBytes = len; }

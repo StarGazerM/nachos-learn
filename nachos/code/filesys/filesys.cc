@@ -433,6 +433,7 @@ FileSystem::Print()
     delete directory;
 } 
 
+#ifdef LOG_FS
 //--------------------------------------------------------------------
 // Save maps into disk
 // Currently, file header map will be save to sector 3 and sector 4
@@ -548,7 +549,7 @@ void FileSystem::CleanSegments()
 {
     // check whether condition is satisfied
     int cleanNum = std::count_if(segTable.begin(), segTable.end()
-                        , [](DiskSegment* sptr){ sptr->IsClean();});
+                        , [](DiskSegment* sptr){ return sptr->IsClean();});
     if(cleanNum > 20)
         return;
 
@@ -559,7 +560,7 @@ void FileSystem::CleanSegments()
     for(int i = 0; i < (20-cleanNum); i++)
     {
         it = std::find_if_not(it, segTable.end()
-                        , [](DiskSegment* sptr){ sptr->IsClean();});
+                        , [](DiskSegment* sptr){ return sptr->IsClean();});
         to_be_clean.push_back(*it);
     }
     // collect all live data
@@ -586,7 +587,7 @@ void FileSystem::CleanSegments()
         int version = p.second.last_access;
         // find a clean segment
         auto cleanSeg = std::find_if(segTable.begin(), segTable.end()
-                        , [](DiskSegment* sptr){ sptr->IsClean();});
+                        , [](DiskSegment* sptr){ return sptr->IsClean();});
         // read data out
         char datatmp[SectorSize];
         kernel->synchDisk->ReadSector(originalSec, datatmp);
@@ -628,5 +629,6 @@ void FileSystem::CleanSegments()
         segptr->Clear();
     }
 }
+#endif
 
 #endif // FILESYS_STUB

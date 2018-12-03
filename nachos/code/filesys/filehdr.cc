@@ -551,7 +551,7 @@ FileHeader::ByteToSector(int offset)
         return ret;
     }
 }
-#endif
+
 
 //----------------------------------------------------------------------
 // FileHeader::UpdateSectorNum
@@ -591,14 +591,14 @@ FileHeader::UpdateSectorNum(int offset, int newSector, int nameHash)
     else
     {
         // FIXME: not implement yet!!
-        current = current - NumIndirect * NumData * SectorSize;
-        DoubleIndirectHeader *dtmp = new DoubleIndirectHeader;
-        dtmp->FetchFrom(doubleIndirect);
-        originalSec = dtmp->ByteToSector(current);
-        delete dtmp;
+        // current = current - NumIndirect * NumData * SectorSize;
+        // DoubleIndirectHeader *dtmp = new DoubleIndirectHeader;
+        // dtmp->FetchFrom(doubleIndirect);
+        // originalSec = dtmp->ByteToSector(current);
+        // delete dtmp;
     }
 }
-
+#endif
 //----------------------------------------------------------------------
 // FileHeader::FileLength
 // 	Return the number of bytes in the file.
