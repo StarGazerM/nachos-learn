@@ -46,6 +46,11 @@ class Bitmap {
 
     void Print() const;		// Print contents of bitmap
     void SelfTest();		// Test whether bitmap is working
+
+    unsigned int *GetBits(){ return map; }
+    int GetNumBits(){ return numBits; }
+    void SetBits(unsigned int *bits){ map = bits; };
+    int GetNumWords(){ return numWords;}
     
   protected:
     int numBits;		// number of bits in the bitmap

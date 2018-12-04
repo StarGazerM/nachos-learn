@@ -50,7 +50,7 @@ Building and starting user-level programs in NachOS:
     - 3.3 删除操作位于最低优先级，并发时先处理读写 **x**
 
 ## log structure file system
-1. 构建ADT
+1. 构建ADT **√**
     - FileHeaderMap, 保存filedeader在log中的位置， 实际上等于在磁盘上的位置，此处需缓存map！
     - Segment, 保存当前段在磁盘中的offset， seg 中存放一个块做segment sumary
     - SegmentSummary, 保存段内文件的编号和对应的文件块在段内的偏移， 操作时间，版本号
@@ -76,5 +76,7 @@ Building and starting user-level programs in NachOS:
 
 5. 读操作
     - 查询cache中的fileheadermap即可
+
+
 
 

@@ -33,6 +33,9 @@ class Scheduler {
     void Print();		// Print contents of ready list
     
     // SelfTest for scheduler is implemented in class Thread
+
+    // When a thread is trying to open a file, it needs to make sure no other thread has already open it.
+    Thread* threadOpenningFile();
     
   private:
     List<Thread *> *readyList;  // queue of threads that are ready to run,

@@ -100,7 +100,7 @@ Kernel::Initialize()
     machine = new Machine(debugUserProg);
     synchConsoleIn = new SynchConsoleInput(consoleIn); // input from stdin
     synchConsoleOut = new SynchConsoleOutput(consoleOut); // output to stdout
-    synchDisk = new SynchDisk();    //
+    synchDisk = new WithLogCache(new SynchDisk());    //
 #ifdef FILESYS_STUB
     fileSystem = new FileSystem();
 #else

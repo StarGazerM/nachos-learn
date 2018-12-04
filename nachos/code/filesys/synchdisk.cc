@@ -16,7 +16,8 @@
 
 #include "copyright.h"
 #include "synchdisk.h"
-
+#include "cache.h"
+#include "main.h"
 
 //----------------------------------------------------------------------
 // SynchDisk::SynchDisk
@@ -91,4 +92,58 @@ void
 SynchDisk::CallBack()
 { 
     semaphore->V();
+}
+
+IDiskDecorator::~IDiskDecorator()
+{
+    delete _disk;
+}
+
+WithLogCache::WithLogCache(IDisk *disk):IDiskDecorator(disk)
+{
+    write_cache = new LogCache;
+    read_cache = new ReadCache;
+}
+
+void WithLogCache::ReadSector(int sectorNumber, char* data)
+{
+    try
+    {
+        read_cache->Read(sectorNumber, data);
+    }
+    catch(const std::out_of_range& e)
+    {
+        // handle cache miss here, dirctely read from disk
+        // and the add data to cache
+        IDiskDecorator::ReadSector(sectorNumber, data);
+        read_cache->UpdateOrAdd(sectorNumber, data);
+    }
+    
+}
+
+void WithLogCache::WriteSector(int sectorNumber, char* data)
+{
+    // TODO: plz check whether file name is realy useful.....
+    // if(kernel->currentThread->GetCurrentFD() == nullptr)
+    // {
+    //     return;
+    // }
+    // char* name = kernel->currentThread->GetCurrentFD()->GetFileName();
+
+    // std::hash<std::string> hash_fn;
+    // int nameHash = hash_fn(std::string(name));
+    write_cache->Append(sectorNumber, data, _disk);
+    read_cache->UpdateOrAdd(sectorNumber, data);
+}
+
+void WithLogCache::Flush()
+{
+    write_cache->Persist(_disk);
+    read_cache->Clear();
+}
+
+WithLogCache::~WithLogCache()
+{
+    delete  write_cache;
+    delete read_cache;
 }

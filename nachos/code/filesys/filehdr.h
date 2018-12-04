@@ -61,8 +61,13 @@ class IndirectHeader
 
     void Deallocate(PersistentBitmap *freeMap);
     void FetchFrom(int sectorNumber); 	
-    void WriteBack(int sectorNumber); 	
+    void WriteBack(int sectorNumber);
+    void UpdateSectorNum(int offset, int newSector, int nameHash);  
+#ifndef LOG_FS 	
     int ByteToSector(int offset, PersistentBitmap *freeMap);
+#else
+    int ByteToSector(int offset);
+#endif
 };
 
 // a block full of pointer to directs data block, whcih
@@ -79,23 +84,13 @@ class DoubleIndirectHeader
     void Deallocate(PersistentBitmap *freeMap);
     void FetchFrom(int sectorNumber); 	
     void WriteBack(int sectorNumber);
+    void UpdateSectorNum(int offset, int newSector, int hash);  
+#ifndef LOG_FS 	
     int ByteToSector(int offset, PersistentBitmap *freeMap);
+#else
+    int ByteToSector(int offset);
+#endif
 };
-
-// // full of pointer to indirect datd block 
-// class DoubleIndirectHeader
-// {
-//   public:
-//     int indirectHeaders[NumData];
-//     DoubleIndirectHeader()
-//     {
-//         for(int i = 0; i < NumData; i++)
-//             indirectHeaders[0] = -1;
-//     }
-//     void Deallocate(PersistentBitmap *freeMap);
-//     // void FetchFrom(int sectorNumber); 	
-//     // void WriteBack(int sectorNumber);    
-// };
 
 class FileHeader {
   public:
@@ -103,8 +98,18 @@ class FileHeader {
     bool Allocate(PersistentBitmap *bitMap, int fileSize);// Initialize a file header, 
 						//  including allocating space 
 						//  on disk for the file data
+#ifdef LOG_FS
+    bool Allocate();    // allocate a empty file header
+    bool AppendOne(char* name, int sectorNumber);   // append one empty sector for this file
+#endif
     void Deallocate(PersistentBitmap *bitMap);  // De-allocate this file's 
 						//  data blocks
+
+#ifdef LOG_FS
+    void Deallocate();  // dellocate the data block of this file
+                        // in LFS, we just need to delete the file header
+                        // in inode map(file header map)
+#endif
 
     void FetchFrom(int sectorNumber); 	// Initialize file header from disk
     void WriteBack(int sectorNumber); 	// Write modifications to file header
@@ -113,9 +118,18 @@ class FileHeader {
     int ByteToSector(int offset);	// Convert a byte offset into the file
 					// to the disk sector containing
 					// the byte
+#ifdef LOG_FS
+    void UpdateSectorNum(int offset, int newSector, int nameHash); 
+                    // this will point a origanls sector in file into
+                    // another sector, this operation need to be carefull.
+                    // cause the correctness is not ensured in function itself
+                    // it may also useful in COW
+#endif
 
     int FileLength();			// Return the length of the file 
+    void SetFileLength(int len){ numBytes = len; }
 					// in bytes
+    int GetSectorNum(){ return numSectors; }
 
     void Print();			// Print the contents of the file.
 

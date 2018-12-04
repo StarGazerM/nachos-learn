@@ -51,6 +51,7 @@
 #include "directory.h"
 #include "filehdr.h"
 #include "filesys.h"
+#include "main.h"
 
 // Sectors containing the file headers for the bitmap of free sectors,
 // and the directory of files.  These file headers are placed in well-known 
@@ -79,7 +80,7 @@
 //----------------------------------------------------------------------
 
 FileSystem::FileSystem(bool format)
-{ 
+{   
     DEBUG(dbgFile, "Initializing the file system.");
     if (format) {
         PersistentBitmap *freeMap = new PersistentBitmap(NumSectors);
@@ -228,7 +229,12 @@ FileSystem::Create(char *name, int initialSize)
 
 OpenFile *
 FileSystem::Open(char *name)
-{ 
+{   
+    Thread *threadOpenningfile = kernel->scheduler->threadOpenningFile();
+    if(threadOpenningfile){
+        return threadOpenningfile->GetCurrentFD();
+    }
+
     Directory *directory = new Directory(NumDirEntries);
     OpenFile *openFile = NULL;
     int sector;

@@ -43,6 +43,7 @@
 
 #include "machine.h"
 #include "addrspace.h"
+#include "openfile.h"
 
 // CPU register state to be saved on context switch.  
 // The x86 needs to save only a few registers, 
@@ -113,7 +114,9 @@ class Thread {
 				// (If NULL, don't deallocate stack)
     ThreadStatus status;	// ready, running or blocked
     char* name;
-
+    OpenFile* currentFD;  // current file descripor in use, this is for the sync of file
+                          // this will be updated when file is being written or read
+    
     void StackAllocate(VoidFunctionPtr func, void *arg);
     				// Allocate a stack for thread.
 				// Used internally by Fork()
@@ -127,6 +130,9 @@ class Thread {
   public:
     void SaveUserState();		// save user-level register state
     void RestoreUserState();		// restore user-level register state
+
+    OpenFile* GetCurrentFD(){ return currentFD; }
+    void SetCurrentFD(OpenFile* fd){ currentFD = fd; }
 
     AddrSpace *space;			// User code this thread is running.
 };

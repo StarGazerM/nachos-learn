@@ -191,7 +191,7 @@
 # of "-DSIM_FIX" to the DEFINES.  This should be enabled by default
 # and eventually will not require the symbol definition
 ################################################################
-DEFINES = -DRDATA -DSIM_FIX
+DEFINES = -DLOG_FS -DRDATA -DSIM_FIX
 
 
 #####################################################################
@@ -299,16 +299,22 @@ FILESYS_H =../filesys/directory.h \
 	../filesys/filesys.h \
 	../filesys/openfile.h\
 	../filesys/pbitmap.h\
-	../filesys/synchdisk.h
+	../filesys/synchdisk.h\
+	../filesys/filehdrmap.h\
+	../filesys/segment.h\
+	../filesys/cache.h
 
 FILESYS_C =../filesys/directory.cc\
 	../filesys/filehdr.cc\
 	../filesys/filesys.cc\
 	../filesys/pbitmap.cc\
 	../filesys/openfile.cc\
-	../filesys/synchdisk.cc
+	../filesys/synchdisk.cc\
+	../filesys/filehdrmap.cc\
+	../filesys/segment.cc\
+	../filesys/cache.cc
 
-FILESYS_O =directory.o filehdr.o filesys.o pbitmap.o openfile.o synchdisk.o
+FILESYS_O =directory.o filehdr.o filesys.o pbitmap.o openfile.o synchdisk.o filehdrmap.o segment.o cache.o
 
 NETWORK_H = ../network/post.h
 

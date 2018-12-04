@@ -23,7 +23,8 @@ class PostOfficeInput;
 class PostOfficeOutput;
 class SynchConsoleInput;
 class SynchConsoleOutput;
-class SynchDisk;
+// class SynchDisk;
+class IDisk;
 
 class Kernel {
   public:
@@ -52,7 +53,7 @@ class Kernel {
     Machine *machine;           // the simulated CPU
     SynchConsoleInput *synchConsoleIn;
     SynchConsoleOutput *synchConsoleOut;
-    SynchDisk *synchDisk;
+    IDisk *synchDisk;
     FileSystem *fileSystem;     
     PostOfficeInput *postOfficeIn;
     PostOfficeOutput *postOfficeOut;
