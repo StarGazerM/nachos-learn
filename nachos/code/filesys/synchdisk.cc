@@ -124,10 +124,15 @@ void WithLogCache::ReadSector(int sectorNumber, char* data)
 void WithLogCache::WriteSector(int sectorNumber, char* data)
 {
     // TODO: plz check whether file name is realy useful.....
-    char* name = kernel->currentThread->GetCurrentFD()->GetFileName();
-    std::hash<std::string> hash_fn;
-    int nameHash = hash_fn(std::string(name));
-    write_cache->Append(sectorNumber, data, nameHash, _disk);
+    // if(kernel->currentThread->GetCurrentFD() == nullptr)
+    // {
+    //     return;
+    // }
+    // char* name = kernel->currentThread->GetCurrentFD()->GetFileName();
+
+    // std::hash<std::string> hash_fn;
+    // int nameHash = hash_fn(std::string(name));
+    write_cache->Append(sectorNumber, data, _disk);
     read_cache->UpdateOrAdd(sectorNumber, data);
 }
 

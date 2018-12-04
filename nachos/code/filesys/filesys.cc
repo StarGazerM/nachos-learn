@@ -151,7 +151,7 @@ FileSystem::FileSystem(bool format)
             // calculate the start sector of each segment
             segTable[i] = new DiskSegment(i*SegSize + DataSegStart);
         }
-        SaveToCheckPoint();
+        // SaveToCheckPoint();
     #endif
     }
     else
@@ -265,6 +265,7 @@ FileSystem::Create(char* name)
     hdr->WriteBack(newSector);
     // add into file header map
     fileHrdMap->UpdateFileHdr(name, version, newSector);
+    return true;
 }
 
 #endif
@@ -316,7 +317,7 @@ FileSystem::Open(char *name)
         e.what();
         Abort();   
     }
-    openFile = new OpenFile(sector);
+    openFile = new OpenFile(sector, name);
     return openFile;
 }
 
@@ -457,8 +458,8 @@ void FileSystem::SaveToCheckPoint()
                                                 // begin of the sector
     memcpy(&(hdrcheckp[sizeof(int)]), hdrbuf, sizeof(HdrInfo)*len);
                                                 // copy the content of map
-    kernel->synchDisk->WriteSector(3 ,hdrcheckp);
-    kernel->synchDisk->WriteSector(4, &(hdrcheckp[SectorSize]));
+    kernel->synchDisk->WriteSector(5 ,hdrcheckp);
+    kernel->synchDisk->WriteSector(6, &(hdrcheckp[SectorSize]));
 
     // save the status of segment summary to the head of each segment
     int start = SegSize - 1; // the start of all writable data is at 15 sector

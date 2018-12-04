@@ -564,11 +564,12 @@ FileHeader::UpdateSectorNum(int offset, int newSector, int nameHash)
 {
     // first of all find that sector
     int originalSec;
-    ASSERT(offset <= numBytes)
+    ASSERT(offset <= numSectors*SectorSize)
     if(offset < NumDirect*SectorSize)
     {
         // originalSec = dataSectors[offset / SectorSize];
         dataSectors[offset / SectorSize] = newSector;
+        return;
     }
     int current = offset - NumDirect*SectorSize;
     if(current < NumIndirect * NumData * SectorSize)
@@ -587,6 +588,7 @@ FileHeader::UpdateSectorNum(int offset, int newSector, int nameHash)
         int newIndirectSecNum = seg->AllocateSector(nameHash, std::time(nullptr));
         idtmp->WriteBack(newIndirectSecNum);
         delete idtmp;
+        return;
     }
     else
     {

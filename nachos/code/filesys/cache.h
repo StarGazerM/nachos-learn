@@ -35,13 +35,13 @@ private:
              // is possible end num is less than  start
   int dirtybits;  // keep track how many data hasn't been persisted
   std::array<char, BUFFER_SIZE> buffer;
-  std::map<int, std::pair<int,NameHashCode>> sectorMap;  // key is sector number
-                                                // value is it's address in log and it's file name hash code 
+  std::map<int, int> sectorMap;  // key is sector number
+                                // value is it's address in log
 
 public:
   LogCache();
   void Read(int sectorNum, char* dest) throw(std::out_of_range); // read a sector from cache
-  int Append(int sectorNum, char *data, NameHashCode filename, IDisk *disk);
+  void Append(int sectorNum, char *data, IDisk *disk);
   void Persist(IDisk *disk); // save all data in memory into disk
                   // it will be triggered if buffer is full
                   // or system shutdown

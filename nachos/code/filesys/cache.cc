@@ -1,7 +1,7 @@
 #include "cache.h"
 #include <cstring>
 #include "main.h"
-#include "disk.h"
+#include "synchdisk.h"
 
 LogCache::LogCache()
 {
@@ -18,7 +18,7 @@ void LogCache::Read(int sectorNum, char *dest) throw(std::out_of_range)
         // cache miss
         throw std::out_of_range("cache miss");
     }
-    int buf_pos = sectorMap[sectorNum].first;
+    int buf_pos = sectorMap[sectorNum];
     // TODO: change the sector size hard code to macro define
     // which a totolly refactor of fs require is needed
     std::memcpy(&(dest[0]), &(buffer[buf_pos]), SectorSize); // read data from buffer
@@ -29,7 +29,7 @@ void LogCache::Read(int sectorNum, char *dest) throw(std::out_of_range)
 //  this will  append a sector onto cache, and it's real sector number on
 //  disk will be returned
 //---------------------------------------------------------------------------------
-int LogCache::Append(int sectorNum, char *data, NameHashCode filename, IDisk *disk)
+void LogCache::Append(int sectorNum, char *data, IDisk *disk)
 {
     if (dirtybits + SectorSize >= BUFFER_SIZE)
     {
@@ -38,7 +38,7 @@ int LogCache::Append(int sectorNum, char *data, NameHashCode filename, IDisk *di
         this->Persist(disk);
         sectorMap.erase(sectorMap.begin()); // the orignal head is overlaped
     }
-    sectorMap[sectorNum] = make_pair(end, filename);
+    sectorMap[sectorNum] = end;
     for (int i = 0; i < SectorSize; i++)
     {
         if ((end + i) < SectorSize)
@@ -83,16 +83,19 @@ void LogCache::Persist(IDisk *disk)
         // }
         // persist to the end of current sector
         int seg = kernel->fileSystem->currentSeg;
-        NameHashCode name; // get the file name of the block need to be persisted
+        int sec; // get the file name of the block need to be persisted
+
         for (auto s : sectorMap)
         {
             if (start + persisted == s.first)
             {
-                name = s.second.second;
+                sec = s.second;
                 break;
             }
         }
-        kernel->fileSystem->segTable[seg]->Write(SectorSize, &(buffer[start + persisted]));
+        //kernel->fileSystem->segTable[seg]->Write(SectorSize, &(buffer[start + persisted]));
+        // FIXME: here the sector number many be wrong, double check
+        disk->WriteSector(sec, &(buffer[start + persisted]));
 
         // if sector is full, continue on next empty segment
         // for here, next find  will start at directly next seg, casue
@@ -110,6 +113,7 @@ void LogCache::Persist(IDisk *disk)
                 // the disk should not be really full.....
                 // in LFS it is prerequsite
                 ASSERT(seg != kernel->fileSystem->currentSeg)
+                seg++;
             }
             kernel->fileSystem->currentSeg = seg;
         }
@@ -132,7 +136,8 @@ void ReadCache::Read(int sec, char* dest)throw(std::out_of_range)
     }
     else
     {
-        std::memcpy(dest, &(buffer[sec][0]), SectorSize);
+        SectorArray tmp = buffer[sec];
+        std::memcpy(dest, &(tmp[0]), SectorSize);
     }
 }
 

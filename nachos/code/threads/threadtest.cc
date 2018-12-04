@@ -12,19 +12,15 @@ SimpleThread(int which)
     //     printf("*** thread %d looped %d times\n", which, num);
     //     kernel->currentThread->Yield();
     // }
-    if(kernel->fileSystem->Create("test1", 5125))
+    if(kernel->fileSystem->Create("f1"))
     {
         cout << "success" << endl;
     }
-    if(kernel->fileSystem->Create("test2", 128))
-    {
-        OpenFile* test = kernel->fileSystem->Open("test2");
-        test->WriteAt("aaaa", 4, 126);
-        char tmp[10];
-        test->ReadAt(tmp, 4, 126);
-        tmp[4] = '\0';
-        cout << tmp << endl;
-    }
+    OpenFile * file = kernel->fileSystem->Open("f1");
+    file->AppendOneSector("aaa", 3);
+    char tmp[4];
+    file->ReadAt(tmp,2, 0);
+    cout << tmp << endl;
 }
 
 void

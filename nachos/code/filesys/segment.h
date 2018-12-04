@@ -49,8 +49,8 @@ class DiskSegment
     bool IsClean();
     bool IsFull();
     void Clear();   // delete all data on this segment
-    int AllocateSector(char* name, int version)throw(std::overflow_error);
-    int AllocateSector(int nameHash, int version)throw(std::overflow_error);            
+    int AllocateSector(char* name, int version);
+    int AllocateSector(int nameHash, int version);            
                                       // alloacte a sector to a file 
     bool Write(int len, char *data); // write a sector into segment. this kind of 
                                     // write will cause a real disk io
@@ -58,7 +58,7 @@ class DiskSegment
     Bitmap *GetUsage() { return usageTable; }
     void SetEnd(int end) { this->end = end; }
     int GetEnd() { return end; }
-    int SetBegin(int begin) { this->begin = begin; }
+    void SetBegin(int begin) { this->begin = begin; }
     int GetBegin() { return begin; }
 
     ~DiskSegment(){ delete usageTable; }
