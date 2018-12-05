@@ -48,7 +48,7 @@ void
 ThreadTest()
 {
     Thread *t = new Thread("forked thread");
-    t->Fork((VoidFunctionPtr)TestCreate, (void *) 1);
+    t->Fork((VoidFunctionPtr)TestRestore, (void *) 1);
     
     // SimpleThread(0);
 }

@@ -586,6 +586,7 @@ FileHeader::UpdateSectorNum(int offset, int newSector, int nameHash)
         int currentSegNum = kernel->fileSystem->currentSeg;
         DiskSegment *seg = kernel->fileSystem->segTable[currentSegNum];
         int newIndirectSecNum = seg->AllocateSector(nameHash, std::time(nullptr));
+        indirects[indirectOff] = newIndirectSecNum;
         idtmp->WriteBack(newIndirectSecNum);
         delete idtmp;
         return;
