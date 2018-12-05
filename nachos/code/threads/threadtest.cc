@@ -17,9 +17,19 @@ TestCreate(int which)
         cout << "success" << endl;
     }
     OpenFile * file = kernel->fileSystem->Open("f1");
-    file->AppendOneSector("aaa", 3);
-    char tmp[4];
-    file->ReadAt(tmp,2, 0);
+    // file->AppendOneSector("aaa", 3);
+    array<char, 128> oneSector;
+    oneSector.fill('a');
+    for(int i = 0; i < 20; i++)
+    {
+        file->AppendOneSector(&(oneSector[0]), 128);
+    }
+    file->AppendOneSector(&(oneSector[0]), 128);
+    // file->AppendOneSector(&(oneSector[0]), 128);
+
+    char tmp[18];
+    file->ReadAt(tmp,16, 2560);
+    tmp[16] = '\0';
     cout << tmp << endl;
     kernel->interrupt->Halt();
 }
@@ -27,8 +37,9 @@ void
 TestRestore(int ww)
 {
     OpenFile * file = kernel->fileSystem->Open("f1");
-    char tmp[4];
-    file->ReadAt(tmp, 2, 0);
+    char tmp[18];
+    file->ReadAt(tmp,16, 0);
+    tmp[16] = '\0';
     cout << tmp << endl;
     kernel->interrupt->Halt();
 }
@@ -37,7 +48,7 @@ void
 ThreadTest()
 {
     Thread *t = new Thread("forked thread");
-    t->Fork((VoidFunctionPtr)TestRestore, (void *) 1);
+    t->Fork((VoidFunctionPtr)TestCreate, (void *) 1);
     
     // SimpleThread(0);
 }

@@ -259,7 +259,7 @@ int OpenFile::WriteAt(char *from, int numBytes, int position)
     bcopy(from, &buf[position - (firstSector * SectorSize)], numBytes);
 
     int version = std::time(nullptr);
-    for (i = 0; i <= lastSector * SectorSize; i += SectorSize)
+    for (i = firstSector*SectorSize; i <= lastSector * SectorSize; i += SectorSize)
     {
         // FIXME: version here would be miss match!
         // kernel->synchDisk->WriteSector(hdr->ByteToSector(i),
@@ -270,7 +270,8 @@ int OpenFile::WriteAt(char *from, int numBytes, int position)
         // we need to know which position we have modified
         hdr->UpdateSectorNum(i, newSector, fileHashCode);
         // seg->Write(SectorSize, &buf[i]);
-        kernel->synchDisk->WriteSector(newSector, &(buf[i]));
+        kernel->synchDisk->WriteSector(newSector, 
+                                &(buf[i-SectorSize*firstSector]));
     }
     // write back changed file header
     segNum = kernel->fileSystem->currentSeg;

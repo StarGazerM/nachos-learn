@@ -22,7 +22,7 @@ bool DiskSegment::IsClean()
 
 bool DiskSegment::IsFull()
 {
-    return (end == NumDataSeg);
+    return ((end-begin) >= NumDataSeg);
 }
 
 //-----------------------------------------------------------
@@ -58,6 +58,7 @@ int DiskSegment::AllocateSector(char* name, int version)
             seg++;
         }
         kernel->fileSystem->currentSeg = seg;
+        return kernel->fileSystem->segTable[seg]->AllocateSector(name, version);
     }
     // change usageTable
     end++;
@@ -69,11 +70,31 @@ int DiskSegment::AllocateSector(char* name, int version)
 int DiskSegment::AllocateSector(int nameHash, int version)
 {
     if(IsFull())
-        throw std::overflow_error("this segment is full!");
+    {
+        // if sector is full, continue on next empty segment
+        // for here, next find  will start at directly next seg, so that
+        // this can make full use of sequencial write performance
+        int seg = kernel->fileSystem->currentSeg + 1;
+        while (seg != kernel->fileSystem->currentSeg)
+        {
+            if (!kernel->fileSystem->segTable[seg]->IsFull())
+                break;
+
+            if (seg == NumSeg) // circular
+                seg = 0;
+
+            // the disk should not be really full.....
+            // in LFS it is prerequsite
+            ASSERT(seg != kernel->fileSystem->currentSeg)
+            seg++;
+        }
+        kernel->fileSystem->currentSeg = seg;
+        return kernel->fileSystem->segTable[seg]->AllocateSector(nameHash, version);
+    }
     // change usageTable
     end++;
-    usageTable->Mark(end);
-    summary[end] =  SummaryEntry(version, nameHash);
+    usageTable->Mark(end-begin-1);
+    summary[end-begin-1] =  SummaryEntry(version, nameHash);
     return end;
 }
 

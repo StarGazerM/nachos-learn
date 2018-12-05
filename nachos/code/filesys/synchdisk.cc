@@ -133,6 +133,7 @@ void WithLogCache::WriteSector(int sectorNumber, char* data)
     // std::hash<std::string> hash_fn;
     // int nameHash = hash_fn(std::string(name));
     write_cache->Append(sectorNumber, data, _disk);
+    
     read_cache->UpdateOrAdd(sectorNumber, data);
 }
 
