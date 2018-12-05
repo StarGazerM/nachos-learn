@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-{
-    "files.associations": {
-        "new": "cpp",
-        "iostream": "cpp"
-    }
-=======
 {
     "files.associations": {
         "new": "cpp",
@@ -54,5 +47,4 @@
         "utility": "cpp",
         "valarray": "cpp"
     }
->>>>>>> 337b009121be59cc3898475111b22113ff4f8216
 }

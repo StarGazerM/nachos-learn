@@ -22,6 +22,9 @@
 
 #include "copyright.h"
 #include "interrupt.h"
+#ifdef LOG_FS
+#include "synchdisk.h"
+#endif
 #include "main.h"
 
 // String definitions for debugging messages
@@ -234,7 +237,11 @@ void
 Interrupt::Halt()
 {
     // before machine halt, we need to save our state!
-    //kernel->fileSystem->SaveToCheckPoint();
+#ifdef LOG_FS
+    kernel->fileSystem->SaveToCheckPoint();
+    WithLogCache *disk = (WithLogCache*)kernel->synchDisk;
+    disk->Flush();
+#endif
     cout << "Machine halting!\n\n";
     kernel->stats->Print();
     delete kernel;	// Never returns.

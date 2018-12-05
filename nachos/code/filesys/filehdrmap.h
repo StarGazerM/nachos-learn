@@ -37,7 +37,7 @@ class FileHdrMap
     void UpdateFileHdr(char* name, int version,int logOffset); // add or update the position of
                                                       // an file header
     void UpdateFileHdr(int fileHashCode, int version, int logOffset);
-    void FileContentModified(char* name, int version);  // this will update the version of a file 
+    // void FileContentModified(char* name, int version);  // this will update the version of a file 
     bool DeleteFileHdr(char* name);               // delete an entry in map
     std::vector<HdrInfo>& GetAllEntries(){ return fileHdrs; } 
     void SetAllEntires(std::vector<HdrInfo>& entires){ fileHdrs = entires;};

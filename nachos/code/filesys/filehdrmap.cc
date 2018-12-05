@@ -26,7 +26,7 @@ void FileHdrMap::UpdateFileHdr(char* name, int version, int logOffset)
 {
     std::hash<std::string> hash_fn;
     int fileHashCode = hash_fn(std::string(name));
-    for(auto info : fileHdrs)
+    for(HdrInfo& info : fileHdrs)
     {
         if(info.fileHashCode == fileHashCode)
         {
@@ -57,19 +57,19 @@ void FileHdrMap::UpdateFileHdr(int fileHashCode, int version, int logOffset)
 //  when a file  content is modified, the timestamp of it's summary 
 //  need to be updated  
 //--------------------------------------------------------------------
-void FileHdrMap::FileContentModified(char* name, int version)
-{
-    std::hash<std::string> hash_fn;
-    int fileHashCode = hash_fn(std::string(name));
-    for(auto info : fileHdrs)
-    {
-        if(info.fileHashCode == fileHashCode)
-        {
-            info.last_access = version;
-            return;
-        }
-    }
-}
+// void FileHdrMap::FileContentModified(char* name, int version)
+// {
+//     std::hash<std::string> hash_fn;
+//     int fileHashCode = hash_fn(std::string(name));
+//     for(auto info : fileHdrs)
+//     {
+//         if(info.fileHashCode == fileHashCode)
+//         {
+//             info.last_access = version;
+//             return;
+//         }
+//     }
+// }
 
 bool FileHdrMap::DeleteFileHdr(char* name)
 {

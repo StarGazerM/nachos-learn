@@ -18,7 +18,10 @@
 #include "openfile.h"
 #include "synchdisk.h"
 #include <ctime>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5e468e60b4ff28e92fb94c15b02a40230e8fff93
 
 //----------------------------------------------------------------------
 // OpenFile::OpenFile
@@ -88,12 +91,11 @@ int OpenFile::Read(char *into, int numBytes)
     return result;
 }
 
-int
-OpenFile::Write(char *from, int numBytes)
+int OpenFile::Write(char *into, int numBytes)
 {
-   int result = WriteAt(from, numBytes, seekPosition);
-   seekPosition += result;
-   return result;
+    int result = WriteAt(into, numBytes, seekPosition);
+    seekPosition += result;
+    return result;
 }
 
 //----------------------------------------------------------------------
@@ -142,8 +144,10 @@ int OpenFile::ReadAt(char *into, int numBytes, int position)
     // read in all the full and partial sectors that we need
     buf = new char[numSectors * SectorSize];
     for (i = firstSector; i <= lastSector; i++)
-        kernel->synchDisk->ReadSector(hdr->ByteToSector(i * SectorSize),
-                                      &buf[(i - firstSector) * SectorSize]);
+    {
+        int sec = hdr->ByteToSector(i * SectorSize);
+        kernel->synchDisk->ReadSector(sec, &buf[(i - firstSector) * SectorSize]);
+    }
 
     // copy the part we want
     bcopy(&buf[position - (firstSector * SectorSize)], into, numBytes);
@@ -247,7 +251,6 @@ int OpenFile::WriteAt(char *from, int numBytes, int position)
         return 0; // check request
 
     buf = new char[numSectors * SectorSize];
-    bcopy(from, &buf[position - (firstSector * SectorSize)], numBytes);
     
     firstAligned = (position == (firstSector * SectorSize));
     lastAligned = ((position + numBytes) == ((lastSector + 1) * SectorSize));
@@ -259,8 +262,10 @@ int OpenFile::WriteAt(char *from, int numBytes, int position)
         ReadAt(&buf[(lastSector - firstSector) * SectorSize],
                SectorSize, lastSector * SectorSize);
 
+    bcopy(from, &buf[position - (firstSector * SectorSize)], numBytes);
+
     int version = std::time(nullptr);
-    for (i = 0; i <= lastSector * SectorSize; i += SectorSize)
+    for (i = firstSector*SectorSize; i <= lastSector * SectorSize; i += SectorSize)
     {
         // FIXME: version here would be miss match!
         // kernel->synchDisk->WriteSector(hdr->ByteToSector(i),
@@ -270,7 +275,9 @@ int OpenFile::WriteAt(char *from, int numBytes, int position)
         int newSector = seg->AllocateSector(fileName, version);
         // we need to know which position we have modified
         hdr->UpdateSectorNum(i, newSector, fileHashCode);
-        seg->Write(SectorSize, &buf[i]);
+        // seg->Write(SectorSize, &buf[i]);
+        kernel->synchDisk->WriteSector(newSector, 
+                                &(buf[i-SectorSize*firstSector]));
     }
     // write back changed file header
     segNum = kernel->fileSystem->currentSeg;
@@ -318,14 +325,13 @@ int OpenFile::AppendOneSector(char *from, int numBytes)
         int currentSeg = kernel->fileSystem->currentSeg;
         DiskSegment *segptr = kernel->fileSystem->segTable[currentSeg];
         newSector = segptr->AllocateSector(fileName, std::time(nullptr));
-        char empty[SectorSize]; // initial the new allocated sector with empty content
+        char empty[SectorSize] = {'\0'}; // initial the new allocated sector with empty content
                                 // TODO: this should be optimized
         kernel->synchDisk->WriteSector(newSector, empty);
         hdr->AppendOne(fileName, newSector);
     }
-
+    hdr->SetFileLength(fileLength + numBytes);
     WriteAt(from, numBytes, fileLength);
-    hdr->SetFileLength(fileLength+numBytes);
     return numBytes;
 }
 

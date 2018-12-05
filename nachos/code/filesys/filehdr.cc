@@ -278,16 +278,16 @@ FileHeader::AppendOne(char* name, int sectorNum)
 {
     numSectors++;
     int version = std::time(nullptr);
-    if(numSectors < NumDirect)
+    if(numSectors <= NumDirect)
     {
-        dataSectors[numSectors] = sectorNum;
+        dataSectors[numSectors-1] = sectorNum;
         return true;
     }
-    else if (numSectors < NumIndirect*NumData+NumDirect)
+    else if (numSectors <= NumIndirect*NumData+NumDirect)
     {
         // in indirect data node
-        int indirectOff = (numSectors - NumDirect)/NumData;
-        int dataOffset = (numSectors - NumDirect)%NumData;
+        int indirectOff = (numSectors - NumDirect - 1)/NumData;
+        int dataOffset = (numSectors - NumDirect - 1)%NumData;
         if(indirects[indirectOff] != -1)
         {
             IndirectHeader *idtmp = new IndirectHeader;
@@ -321,7 +321,7 @@ FileHeader::AppendOne(char* name, int sectorNum)
         }
         return true;
     }
-
+    // FIXME: handle with double indrect node 
     return true;
     // in double indirect
 }
