@@ -234,7 +234,7 @@ void
 Interrupt::Halt()
 {
     // before machine halt, we need to save our state!
-    kernel->fileSystem->SaveToCheckPoint();
+    //kernel->fileSystem->SaveToCheckPoint();
     cout << "Machine halting!\n\n";
     kernel->stats->Print();
     delete kernel;	// Never returns.
