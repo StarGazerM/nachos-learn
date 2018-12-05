@@ -280,7 +280,7 @@ FileHeader::AppendOne(char* name, int sectorNum)
     int version = std::time(nullptr);
     if(numSectors < NumDirect)
     {
-        dataSectors[numSectors] = sectorNum;
+        dataSectors[numSectors-1] = sectorNum;
         return true;
     }
     else if (numSectors < NumIndirect*NumData+NumDirect)

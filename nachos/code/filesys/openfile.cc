@@ -138,8 +138,10 @@ int OpenFile::ReadAt(char *into, int numBytes, int position)
     // read in all the full and partial sectors that we need
     buf = new char[numSectors * SectorSize];
     for (i = firstSector; i <= lastSector; i++)
-        kernel->synchDisk->ReadSector(hdr->ByteToSector(i * SectorSize),
-                                      &buf[(i - firstSector) * SectorSize]);
+    {
+        int sec = hdr->ByteToSector(i * SectorSize);
+        kernel->synchDisk->ReadSector(sec, &buf[(i - firstSector) * SectorSize]);
+    }
 
     // copy the part we want
     bcopy(&buf[position - (firstSector * SectorSize)], into, numBytes);
@@ -243,7 +245,6 @@ int OpenFile::WriteAt(char *from, int numBytes, int position)
         return 0; // check request
 
     buf = new char[numSectors * SectorSize];
-    bcopy(from, &buf[position - (firstSector * SectorSize)], numBytes);
     
     firstAligned = (position == (firstSector * SectorSize));
     lastAligned = ((position + numBytes) == ((lastSector + 1) * SectorSize));
@@ -254,6 +255,8 @@ int OpenFile::WriteAt(char *from, int numBytes, int position)
     if (!lastAligned && ((firstSector != lastSector) || firstAligned))
         ReadAt(&buf[(lastSector - firstSector) * SectorSize],
                SectorSize, lastSector * SectorSize);
+
+    bcopy(from, &buf[position - (firstSector * SectorSize)], numBytes);
 
     int version = std::time(nullptr);
     for (i = 0; i <= lastSector * SectorSize; i += SectorSize)
@@ -266,7 +269,8 @@ int OpenFile::WriteAt(char *from, int numBytes, int position)
         int newSector = seg->AllocateSector(fileName, version);
         // we need to know which position we have modified
         hdr->UpdateSectorNum(i, newSector, fileHashCode);
-        seg->Write(SectorSize, &buf[i]);
+        // seg->Write(SectorSize, &buf[i]);
+        kernel->synchDisk->WriteSector(newSector, &(buf[i]));
     }
     // write back changed file header
     segNum = kernel->fileSystem->currentSeg;
@@ -314,14 +318,13 @@ int OpenFile::AppendOneSector(char *from, int numBytes)
         int currentSeg = kernel->fileSystem->currentSeg;
         DiskSegment *segptr = kernel->fileSystem->segTable[currentSeg];
         newSector = segptr->AllocateSector(fileName, std::time(nullptr));
-        char empty[SectorSize]; // initial the new allocated sector with empty content
+        char empty[SectorSize] = {'\0'}; // initial the new allocated sector with empty content
                                 // TODO: this should be optimized
         kernel->synchDisk->WriteSector(newSector, empty);
         hdr->AppendOne(fileName, newSector);
     }
-
+    hdr->SetFileLength(fileLength + numBytes);
     WriteAt(from, numBytes, fileLength);
-    hdr->SetFileLength(fileLength+numBytes);
     return numBytes;
 }
 

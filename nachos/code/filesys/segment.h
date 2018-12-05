@@ -52,7 +52,7 @@ class DiskSegment
     int AllocateSector(char* name, int version);
     int AllocateSector(int nameHash, int version);            
                                       // alloacte a sector to a file 
-    bool Write(int len, char *data); // write a sector into segment. this kind of 
+    // bool Write(int len, char *data); // write a sector into segment. this kind of 
                                     // write will cause a real disk io
     SegmentSummary &GetSummay() { return summary; }
     Bitmap *GetUsage() { return usageTable; }

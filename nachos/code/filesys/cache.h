@@ -30,17 +30,17 @@ using NameHashCode = int;
 class LogCache
 {
 private:
-  int begin; // the start place of current buffer
+  // int begin; // the start place of current buffer
   int end;   // the end place, because it is an circular buffer so it
              // is possible end num is less than  start
-  int dirtybits;  // keep track how many data hasn't been persisted
+  // int dirtybits;  // keep track how many data hasn't been persisted
   std::array<char, BUFFER_SIZE> buffer;
-  std::map<int, int> sectorMap;  // key is sector number
-                                // value is it's address in log
+  std::map<int, int> sectorMap;  // key is the address in buffer
+                                // value is it's sector number
 
 public:
   LogCache();
-  void Read(int sectorNum, char* dest) throw(std::out_of_range); // read a sector from cache
+  // void Read(int sectorNum, char* dest) throw(std::out_of_range); // read a sector from cache
   void Append(int sectorNum, char *data, IDisk *disk);
   void Persist(IDisk *disk); // save all data in memory into disk
                   // it will be triggered if buffer is full

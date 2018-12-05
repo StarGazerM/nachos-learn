@@ -471,7 +471,8 @@ void FileSystem::SaveToCheckPoint()
         int size = (segTable[i]->GetUsage()->GetNumWords()) * sizeof(unsigned int);
         memcpy(&(summaryTmp[0]), &(sumref[0]), sizeof(SegmentSummary));         // save summary entry
         memcpy(&(summaryTmp[sizeof(SegmentSummary)]), usageBits, size);         // save the bit map which mark the live data
-        kernel->synchDisk->WriteSector((i*SegSize+start), summaryTmp);
+        int seg_pos = i*SegSize+start;
+        kernel->synchDisk->WriteSector(seg_pos, summaryTmp);
     }
 
     delete hdrbuf;
@@ -487,8 +488,8 @@ void FileSystem::RestoreFromCheckPoint()
 {
     //TODO: clear original map first
     char *hdrcheckp = new char[2*SectorSize];
-    kernel->synchDisk->ReadSector(3, hdrcheckp);
-    kernel->synchDisk->ReadSector(4, &(hdrcheckp[SectorSize]));
+    kernel->synchDisk->ReadSector(5, hdrcheckp);
+    kernel->synchDisk->ReadSector(6, &(hdrcheckp[SectorSize]));
     int len;        // read the number of entries first
     memcpy(&len, &(hdrcheckp[0]), sizeof(int));
     HdrInfo *hdrbuf = new HdrInfo[len];
@@ -605,7 +606,8 @@ void FileSystem::CleanSegments()
             // to write on, not just not full
             // write data
             int newSec = (*cleanSeg)->AllocateSector(fileName, version);
-            (*cleanSeg)->Write(SectorSize, datatmp);
+            // (*cleanSeg)->Write(SectorSize, datatmp);
+            kernel->synchDisk->WriteSector(newSec, datatmp);
             hdr->UpdateSectorNum(origanlHdrSec*SectorSize, newSec, fileName);
             hdrBuf[hdr] = p.second;
         }

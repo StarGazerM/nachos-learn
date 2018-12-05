@@ -4,7 +4,7 @@
 #include "filehdr.h"
 
 void
-SimpleThread(int which)
+TestCreate(int which)
 {
     // int num;
     
@@ -21,13 +21,23 @@ SimpleThread(int which)
     char tmp[4];
     file->ReadAt(tmp,2, 0);
     cout << tmp << endl;
+    kernel->interrupt->Halt();
+}
+void
+TestRestore(int ww)
+{
+    OpenFile * file = kernel->fileSystem->Open("f1");
+    char tmp[4];
+    file->ReadAt(tmp, 2, 0);
+    cout << tmp << endl;
+    kernel->interrupt->Halt();
 }
 
 void
 ThreadTest()
 {
     Thread *t = new Thread("forked thread");
-    t->Fork((VoidFunctionPtr) SimpleThread, (void *) 1);
+    t->Fork((VoidFunctionPtr)TestRestore, (void *) 1);
     
     // SimpleThread(0);
 }

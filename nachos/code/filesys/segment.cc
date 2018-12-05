@@ -84,20 +84,20 @@ int DiskSegment::AllocateSector(int nameHash, int version)
 //   here!
 //   TODO: merge allocate logic in this write operation
 //---------------------------------------------------------
-bool DiskSegment::Write(int len, char* data)
-{
-    int version = std::time(nullptr);
-    int pos = end + 1;
-    int currentData = 0;
-    int secNum = divRoundUp(len, SectorSize);
-    // FIXME: right now we can only write a whole sector in...
-    for(int i = 0; i < secNum; i++)
-    {
-        kernel->synchDisk->WriteSector(end+i, &(data[currentData]));
-        // summary[end+i] = SummaryEntry(version, fileNameHash);   
-        currentData +=  SectorSize;
-    }
-}
+// bool DiskSegment::Write(int len, char* data)
+// {
+//     int version = std::time(nullptr);
+//     int pos = end + 1;
+//     int currentData = 0;
+//     int secNum = divRoundUp(len, SectorSize);
+//     // FIXME: right now we can only write a whole sector in...
+//     for(int i = 0; i < secNum; i++)
+//     {
+//         kernel->synchDisk->WriteSector(end+i, &(data[currentData]));
+//         // summary[end+i] = SummaryEntry(version, fileNameHash);   
+//         currentData +=  SectorSize;
+//     }
+// }
 //-----------------------------------------------------------
 // DiskSegment::Clear
 //  clear a segment means clear it usage table, marks every 
