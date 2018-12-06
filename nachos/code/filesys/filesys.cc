@@ -293,6 +293,12 @@ FileSystem::Open(char *name)
     if (sector >= 0) 		
 	openFile = new OpenFile(sector);	// name was found in directory 
     delete directory;
+
+    OpenFile *alreadyOpenned = kernel->scheduler->OpenningFD(openFile);
+    if(alreadyOpenned != NULL){
+        openFile = alreadyOpenned;
+    }
+
     return openFile;				// return NULL if not found
 }
 

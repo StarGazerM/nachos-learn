@@ -177,3 +177,18 @@ Scheduler::Print()
     cout << "Ready list contents:\n";
     readyList->Apply(ThreadPrint);
 }
+
+// Loop through the RQ to find if there is an opened file by other thread with the given file name.
+OpenFile* 
+Scheduler::OpenningFD(OpenFile* fileHeader){
+    ListIterator<Thread*> iterator(readyList);
+    while(!iterator.IsDone()){
+        if(iterator.Item()->GetCurrentFD() == fileHeader){
+            return fileHeader;
+        }else{
+            iterator.Next();
+        }
+    }
+    // no other threads in RQ is openning the same file.
+    return NULL;
+}
