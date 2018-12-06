@@ -99,11 +99,21 @@ int DiskSegment::AllocateSector(int nameHash, int version)
 }
 
 //-----------------------------------------------------------
+// DiskSegment::DelocateSector
+//  make a block as dead block, this happened when the content
+//  of this block is changed
+//---------------------------------------------------------
+void DiskSegment::DelocateSector(int sectorNum)
+{
+    ASSERT(sectorNum <= end) // this should be a sector already used
+    usageTable->Clear(sectorNum - begin - 1); // mark it as dead
+}
+//-----------------------------------------------------------
 // DiskSegment::Write
 //   this kind of write is just write a sector to disk, 
 //   plz note that, the correct of this  block is not guaranteed 
 //   here!
-//   TODO: merge allocate logic in this write operation
+//  
 //---------------------------------------------------------
 // bool DiskSegment::Write(int len, char* data)
 // {
@@ -111,7 +121,6 @@ int DiskSegment::AllocateSector(int nameHash, int version)
 //     int pos = end + 1;
 //     int currentData = 0;
 //     int secNum = divRoundUp(len, SectorSize);
-//     // FIXME: right now we can only write a whole sector in...
 //     for(int i = 0; i < secNum; i++)
 //     {
 //         kernel->synchDisk->WriteSector(end+i, &(data[currentData]));

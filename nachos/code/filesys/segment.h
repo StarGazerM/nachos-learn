@@ -54,6 +54,7 @@ class DiskSegment
                                       // alloacte a sector to a file 
     // bool Write(int len, char *data); // write a sector into segment. this kind of 
                                     // write will cause a real disk io
+    void DelocateSector(int sectorNum); // collect a dead sector
     SegmentSummary &GetSummay() { return summary; }
     Bitmap *GetUsage() { return usageTable; }
     void SetEnd(int end) { this->end = end; }
@@ -70,7 +71,6 @@ class DiskSegment
     SegmentSummary summary; // all summary is stored in the first sector in segment
     Bitmap *usageTable;     // usagtable in each seg will be saved together in an special sector
                             // in reserved sector
-                            // TODO: when a file is written this need to be clear
 };
 
 #endif

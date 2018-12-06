@@ -78,6 +78,7 @@ class SynchDisk : public IDisk {
 					// can be sent to the disk at a time
 };
 
+#ifdef LOG_FS
 // This is the base class for decorator, it will be useful if you 
 // just want to add some feature to exist interface
 // the decorator in cpp is not so elegent, but we have to
@@ -123,5 +124,6 @@ class WithLogCache : public IDiskDecorator
     void Flush();    // flush the cache to physical disk
     ~WithLogCache();
 };
+#endif
 
 #endif // SYNCHDISK_H

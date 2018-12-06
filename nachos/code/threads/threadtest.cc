@@ -73,7 +73,7 @@ SyncReadTest(int which)
     OpenFile* rtest = kernel->fileSystem->Open("test2");
     rtest->Seek(1);
     rtest->Read(intor, 4);
-    intor[0] = 'r';
+    //intor[0] = 'r';
     intor[4] = '\0';
     cout<<"Reader #"<<which<<" read "<<intor<<"\n";
 }

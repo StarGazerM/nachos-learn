@@ -366,6 +366,12 @@ FileSystem::Open(char *name)
     if (sector >= 0) 		
 	openFile = new OpenFile(sector);	// name was found in directory 
     delete directory;
+
+    OpenFile *alreadyOpenned = kernel->scheduler->OpenningFD(openFile);
+    if(alreadyOpenned != NULL){
+        openFile = alreadyOpenned;
+    }
+
     return openFile;				// return NULL if not found
 }
 
@@ -561,7 +567,6 @@ void FileSystem::SaveToCheckPoint()
 //--------------------------------------------------------------------
 void FileSystem::RestoreFromCheckPoint()
 {
-    //TODO: clear original map first
     char *hdrcheckp = new char[2*SectorSize];
     kernel->synchDisk->ReadSector(5, hdrcheckp);
     kernel->synchDisk->ReadSector(6, &(hdrcheckp[SectorSize]));
@@ -625,84 +630,92 @@ void FileSystem::RestoreFromCheckPoint()
 void FileSystem::CleanSegments()
 {
     // check whether condition is satisfied
-    int cleanNum = std::count_if(segTable.begin(), segTable.end()
-                        , [](DiskSegment* sptr){ return sptr->IsClean();});
-    if(cleanNum > 20)
-        return;
+    int cleanNum = std::count_if(segTable.begin(), segTable.end(), [](DiskSegment *sptr) { return sptr->IsClean(); });
 
-    std::vector<DiskSegment*> to_be_clean;
+    // in real use open this, set flag to 1
+    // if (cleanNum > 20)
+    //     return;
+
+    std::vector<DiskSegment *> to_be_clean;
     // need clean
     // find the segment need to be clean
-    auto it = segTable.begin();
-    for(int i = 0; i < (20-cleanNum); i++)
+    auto dit = segTable.begin();
+    // for(int i = 0; i < (20-cleanNum); i++)
+    // {
+    //     dit = std::find_if_not(dit, segTable.end()
+    //                     , [](DiskSegment* sptr){ return sptr->IsClean();});
+    //     to_be_clean.push_back(*dit);
+    // }
+
+    // cleamn policy will clean the 5 dirty block whose clean sector is
+    // less than other
+    // find all dirty segments
+    for(auto seg : segTable)
     {
-        it = std::find_if_not(it, segTable.end()
-                        , [](DiskSegment* sptr){ return sptr->IsClean();});
-        to_be_clean.push_back(*it);
+        if(!seg->IsClean())
+            to_be_clean.push_back(seg);
     }
+    // get most clean 5 segment as the segment to be clean
+    std::nth_element(to_be_clean.begin(), to_be_clean.begin()+4, to_be_clean.end(), 
+                        [](DiskSegment* s1, DiskSegment* s2){ return s1->NumAlive()<s2->NumAlive();});
+
     // collect all live data
     std::map<int, SummaryEntry> live_sec;
-    for(auto sptr : to_be_clean)
+    for (auto sptr : to_be_clean)
     {
-        Bitmap * usageMap = sptr->GetUsage();
-        for(int i = 0; i < NumDataSeg; i++)
+        Bitmap *usageMap = sptr->GetUsage();
+        for (int i = 0; i < NumDataSeg; i++)
         {
-            if(usageMap->Test(i))
+            if (usageMap->Test(i))
             {
                 // SummaryEntry s = (sptr->GetSummay())[i];
-                live_sec[sptr->GetBegin()+1]= (sptr->GetSummay())[i];
+                live_sec[sptr->GetBegin() + 1] = (sptr->GetSummay())[i];
             }
         }
     }
 
     // rewrite all these data to empty segment and update file header map
-    std::map<FileHeader*, SummaryEntry> hdrBuf;   // use ptr ....it is bad idea but the stack size is percious
-    for(auto p : live_sec)
+    std::map<FileHeader *, SummaryEntry> hdrBuf; // use ptr ....it is bad idea but the stack size is percious
+    for (auto p : live_sec)
     {
         int originalSec = p.first;
         int fileName = p.second.fileHashCode;
         int version = p.second.last_access;
         // find a clean segment
-        auto cleanSeg = std::find_if(segTable.begin(), segTable.end()
-                        , [](DiskSegment* sptr){ return sptr->IsClean();});
+        auto cleanSeg = std::find_if(segTable.begin(), segTable.end(), [](DiskSegment *sptr) { return sptr->IsClean(); });
         // read data out
         char datatmp[SectorSize];
         kernel->synchDisk->ReadSector(originalSec, datatmp);
         // update file hdr map, the write back of file header should be done at last
-        int origanlHdrSec;
         try
         {
-            origanlHdrSec = fileHrdMap->FindFileHeader(fileName);
-            // read file hdr out
+            int origanlHdrSec = fileHrdMap->FindFileHeader(fileName);
             FileHeader *hdr = new FileHeader;
-            hdr->FetchFrom(originalSec);
-            // FIXME: Modify a sector number in a filehdr, this is extremely hard
-            // NOTE: I am not using write at, because we want a really "clean" seg
-            // to write on, not just not full
+            hdr->FetchFrom(origanlHdrSec);
             // write data
             int newSec = (*cleanSeg)->AllocateSector(fileName, version);
             // (*cleanSeg)->Write(SectorSize, datatmp);
             kernel->synchDisk->WriteSector(newSec, datatmp);
-            hdr->UpdateSectorNum(origanlHdrSec*SectorSize, newSec, fileName);
+            hdr->ReplaceSectorNum(originalSec, newSec, fileName);
             hdrBuf[hdr] = p.second;
+            
         }
-        catch(const exception &e)
+        catch (const exception &e)
         {
             // it happens when file is deleted
         }
     }
 
     // write back file header
-    for(auto it : hdrBuf)
+    for (auto it : hdrBuf)
     {
-        int newSec = segTable[currentSeg]->AllocateSector(it.second.fileHashCode
-                                                        , it.second.last_access);
+        int newSec = segTable[currentSeg]->AllocateSector(it.second.fileHashCode, it.second.last_access);
         it.first->WriteBack(newSec);
-        fileHrdMap->UpdateFileHdr(it.second.fileHashCode, it.second.last_access,newSec);
+        fileHrdMap->UpdateFileHdr(it.second.fileHashCode, it.second.last_access, newSec);
     }
 
     // finally release original segment
-    for(auto segptr : to_be_clean)
+    for (auto segptr : to_be_clean)
     {
         segptr->Clear();
     }

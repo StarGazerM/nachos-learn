@@ -97,9 +97,8 @@ class FileSystem {
 	void RestoreFromCheckPoint();	// restore maps from check point
 	void CleanSegments();			// run segment clean
 									// 1. this will be evoked when clean segment is less than 20 segement
-									// 2. the number of sector over thredhold will be cleaned
-									// 3. the segment with less live data will be cleaned
-									// 4. the data from some file will be put together, when rewrite happen
+									// 2. 5 "cleanest" dirty segment will be clean
+									// 3. the data from some file will be put together, when rewrite happen
 	FileHdrMap* GetFileHdrMap(){ return fileHrdMap; }
 	std::array<DiskSegment*, NumSeg> segTable;		// segment usage table
 	int currentSeg;

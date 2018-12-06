@@ -94,6 +94,7 @@ SynchDisk::CallBack()
     semaphore->V();
 }
 
+#ifdef LOG_FS
 IDiskDecorator::~IDiskDecorator()
 {
     delete _disk;
@@ -148,3 +149,4 @@ WithLogCache::~WithLogCache()
     delete  write_cache;
     delete read_cache;
 }
+#endif

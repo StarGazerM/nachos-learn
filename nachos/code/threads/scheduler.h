@@ -34,8 +34,8 @@ class Scheduler {
     
     // SelfTest for scheduler is implemented in class Thread
 
-    // When a thread is trying to open a file, it needs to make sure no other thread has already open it.
-    Thread* threadOpenningFile();
+    // Loop through the RQ to find if there is an opened file by other thread with the given file name.
+    OpenFile* OpenningFD(OpenFile* fileHeader);
     
   private:
     List<Thread *> *readyList;  // queue of threads that are ready to run,
