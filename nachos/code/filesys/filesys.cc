@@ -552,8 +552,10 @@ void FileSystem::CleanSegments()
     // check whether condition is satisfied
     int cleanNum = std::count_if(segTable.begin(), segTable.end()
                         , [](DiskSegment* sptr){ return sptr->IsClean();});
-    if(cleanNum > 20)
-        return;
+    
+    // in real use open this, set flag to 1
+    // if (cleanNum > 20)
+    //     return;
 
     std::vector<DiskSegment*> to_be_clean;
     // need clean
@@ -601,7 +603,6 @@ void FileSystem::CleanSegments()
             // read file hdr out
             FileHeader *hdr = new FileHeader;
             hdr->FetchFrom(originalSec);
-            // FIXME: Modify a sector number in a filehdr, this is extremely hard
             // NOTE: I am not using write at, because we want a really "clean" seg
             // to write on, not just not full
             // write data

@@ -58,6 +58,13 @@ IndirectHeader::WriteBack(int sector)
 void
 IndirectHeader::UpdateSectorNum(int offset, int newSector, int nameHash)
 {
+    // mark original sector dead
+    if(dataSectors[offset] != -1)
+    {
+        int originalSegNum = (dataSectors[offset]/SegSize) - 1;
+        kernel->fileSystem->segTable[originalSegNum]->DelocateSector(dataSectors[offset]);
+    }
+    // change to new number
     dataSectors[offset] = newSector;
 }
 
@@ -567,7 +574,11 @@ FileHeader::UpdateSectorNum(int offset, int newSector, int nameHash)
     ASSERT(offset <= numSectors*SectorSize)
     if(offset < NumDirect*SectorSize)
     {
-        // originalSec = dataSectors[offset / SectorSize];
+        if(dataSectors[offset / SectorSize] != -1)
+        {
+            int originalSegNum = (dataSectors[offset/SectorSize]/SegSize) - 1;
+            kernel->fileSystem->segTable[originalSegNum]->DelocateSector(dataSectors[offset/SectorSize]);
+        }
         dataSectors[offset / SectorSize] = newSector;
         return;
     }
@@ -586,6 +597,14 @@ FileHeader::UpdateSectorNum(int offset, int newSector, int nameHash)
         int currentSegNum = kernel->fileSystem->currentSeg;
         DiskSegment *seg = kernel->fileSystem->segTable[currentSegNum];
         int newIndirectSecNum = seg->AllocateSector(nameHash, std::time(nullptr));
+
+        // make original head as dead
+        if(indirects[indirectOff] != -1)
+        {
+            int originalSegNum = (indirects[indirectOff]/SegSize) - 1;
+            kernel->fileSystem->segTable[originalSegNum]->DelocateSector(indirects[indirectOff]);
+        }
+
         indirects[indirectOff] = newIndirectSecNum;
         idtmp->WriteBack(newIndirectSecNum);
         delete idtmp;

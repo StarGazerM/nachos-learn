@@ -1,6 +1,7 @@
 #include "filehdrmap.h"
 #include <ctime>
 #include <functional>
+#include "main.h"
 
 HdrInfo::HdrInfo(int fileHashCode, int version, int logOffset)
 {
@@ -30,6 +31,9 @@ void FileHdrMap::UpdateFileHdr(char* name, int version, int logOffset)
     {
         if(info.fileHashCode == fileHashCode)
         {
+            // mark the original one as useless
+            int originalSegNum = (info.logOffset/SegSize) - 1;
+            kernel->fileSystem->segTable[originalSegNum]->DelocateSector(info.logOffset);
             info.logOffset = logOffset;
             info.last_access = version;
             return;

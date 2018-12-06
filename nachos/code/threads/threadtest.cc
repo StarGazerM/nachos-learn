@@ -31,12 +31,18 @@ TestCreate(int which)
     file->ReadAt(tmp,16, 2560);
     tmp[16] = '\0';
     cout << tmp << endl;
+    kernel->fileSystem->CleanSegments();
     kernel->interrupt->Halt();
 }
 void
 TestRestore(int ww)
 {
     OpenFile * file = kernel->fileSystem->Open("f1");
+    if(file == NULL)
+    {
+        cout << "file not exsist!" << endl;
+        return;
+    }
     char tmp[18];
     file->ReadAt(tmp,16, 0);
     tmp[16] = '\0';
@@ -48,7 +54,7 @@ void
 ThreadTest()
 {
     Thread *t = new Thread("forked thread");
-    t->Fork((VoidFunctionPtr)TestRestore, (void *) 1);
+    t->Fork((VoidFunctionPtr)TestCreate, (void *) 1);
     
     // SimpleThread(0);
 }

@@ -262,6 +262,7 @@ int OpenFile::WriteAt(char *from, int numBytes, int position)
     for (i = firstSector*SectorSize; i <= lastSector * SectorSize; i += SectorSize)
     {
         // FIXME: version here would be miss match!
+        // reset original bit to useless
         // kernel->synchDisk->WriteSector(hdr->ByteToSector(i),
         //                                &buf[i]); 
         segNum = kernel->fileSystem->currentSeg;

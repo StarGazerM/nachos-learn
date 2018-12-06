@@ -49,8 +49,6 @@ Alarm::CallBack()
     Interrupt *interrupt = kernel->interrupt;
     MachineStatus status = interrupt->getStatus();
 
-    // TODO: add daemon task for persist data in buffer here!
-    
     if (status != IdleMode) {
 	interrupt->YieldOnReturn();
     }

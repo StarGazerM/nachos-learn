@@ -23,6 +23,7 @@
 // 	Interpret command line arguments in order to determine flags 
 //	for the initialization (see also comments in main.cc)  
 //----------------------------------------------------------------------
+void segmentCleanDaemonThread(int flag);
 
 Kernel::Kernel(int argc, char **argv)
 {
@@ -105,6 +106,12 @@ Kernel::Initialize()
     fileSystem = new FileSystem();
 #else
     fileSystem = new FileSystem(formatFlag);
+
+#ifdef LOG_FS
+    diskCleanDaemon = new Thread("diskCleanDaemon");
+    diskCleanDaemon->Fork((VoidFunctionPtr)segmentCleanDaemonThread, (void*)-1);
+#endif
+
 #endif // FILESYS_STUB
     postOfficeIn = new PostOfficeInput(10);
     postOfficeOut = new PostOfficeOutput(reliability);
@@ -242,3 +249,15 @@ Kernel::NetworkTest() {
     // Then we're done!
 }
 
+void
+segmentCleanDaemonThread(int flag)
+{
+    while(true)
+    {
+        if(flag != -1)
+        {
+            kernel->fileSystem->CleanSegments();
+        }
+        kernel->currentThread->Yield();
+    }
+}
