@@ -168,6 +168,8 @@ DoubleIndirectHeader::ByteToSector(int offset)
 
 FileHeader::FileHeader()
 {
+    numBytes = 0;
+    numSectors = 0;
     for(int i = 0; i < NumDirect; i++)
         dataSectors[i] = -1;
     for (int i=0; i < NumIndirect; i++)
