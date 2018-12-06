@@ -242,6 +242,7 @@ FileSystem::Create(char *name, int initialSize)
         delete freeMap;
     }
     delete directory;
+    cout<<"Creating file " << name << " size " << initialSize<<endl;
     return success;
 }
 
@@ -289,6 +290,8 @@ FileSystem::Open(char *name)
     int sector;
 
     DEBUG(dbgFile, "Opening file" << name);
+    cout<<"Opening file "<<name<<endl;
+
     directory->FetchFrom(directoryFile);
     sector = directory->Find(name); 
     if (sector >= 0) 		
@@ -342,6 +345,7 @@ FileSystem::Open(char *name)
 bool
 FileSystem::Remove(char *name)
 { 
+    cout<<"Removing file "<<name<<endl;
     Directory *directory;
     PersistentBitmap *freeMap;
     FileHeader *fileHdr;
@@ -356,6 +360,7 @@ FileSystem::Remove(char *name)
     }
     fileHdr = new FileHeader;
     fileHdr->FetchFrom(sector);
+    printf("file size: %i",fileHdr->FileLength());
 
     freeMap = new PersistentBitmap(freeMapFile,NumSectors);
 
