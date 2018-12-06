@@ -11,6 +11,7 @@
 
 #include "copyright.h"
 #include "list.h"
+#include "openfile.h"
 #include "thread.h"
 
 // The following class defines the scheduler/dispatcher abstraction -- 
@@ -33,6 +34,9 @@ class Scheduler {
     void Print();		// Print contents of ready list
     
     // SelfTest for scheduler is implemented in class Thread
+
+    // Loop through the RQ to find if there is an opened file by other thread with the given file name.
+    OpenFile* OpenningFD(OpenFile* fileHeader);
     
   private:
     List<Thread *> *readyList;  // queue of threads that are ready to run,

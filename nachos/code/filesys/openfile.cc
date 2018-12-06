@@ -32,6 +32,8 @@ OpenFile::OpenFile(int sector)
     hdr = new FileHeader;
     hdr->FetchFrom(sector);
     seekPosition = 0;
+
+    //lock = new Lock("synch lock");
 }
 
 OpenFile::OpenFile(int sector, char *name)
@@ -79,15 +81,15 @@ void OpenFile::Seek(int position)
 
 int OpenFile::Read(char *into, int numBytes)
 {
-    kernel->currentThread->SetCurrentFD(this);
+    //kernel->currentThread->SetCurrentFD(this);
     int result = ReadAt(into, numBytes, seekPosition);
     seekPosition += result;
     return result;
 }
 
-int OpenFile::Write(char *into, int numBytes)
+int OpenFile::Write(char *from, int numBytes)
 {
-    int result = WriteAt(into, numBytes, seekPosition);
+    int result = WriteAt(from, numBytes, seekPosition);
     seekPosition += result;
     return result;
 }
