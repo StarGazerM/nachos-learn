@@ -18,10 +18,6 @@
 #include "openfile.h"
 #include "synchdisk.h"
 #include <ctime>
-<<<<<<< HEAD
-
-=======
->>>>>>> 5e468e60b4ff28e92fb94c15b02a40230e8fff93
 
 //----------------------------------------------------------------------
 // OpenFile::OpenFile

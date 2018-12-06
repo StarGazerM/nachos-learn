@@ -11,6 +11,7 @@
 
 #include "copyright.h"
 #include "list.h"
+#include "openfile.h"
 #include "thread.h"
 
 // The following class defines the scheduler/dispatcher abstraction -- 

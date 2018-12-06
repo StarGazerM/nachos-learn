@@ -51,14 +51,10 @@
 #include "directory.h"
 #include "filehdr.h"
 #include "filesys.h"
-<<<<<<< HEAD
-#include "main.h"
-=======
 #include "synchdisk.h"
 #include "main.h"
 #include <ctime>
 #include <set>
->>>>>>> 5e468e60b4ff28e92fb94c15b02a40230e8fff93
 
 // Sectors containing the file headers for the bitmap of free sectors,
 // and the directory of files.  These file headers are placed in well-known 
@@ -75,10 +71,7 @@
 
 //----------------------------------------------------------------------
 // FileSystem::FileSystem
-<<<<<<< HEAD
-=======
 //  NOTE: before use a disk, format it first! 
->>>>>>> 5e468e60b4ff28e92fb94c15b02a40230e8fff93
 // 	Initialize the file system.  If format = TRUE, the disk has
 //	nothing on it, and we need to initialize the disk to contain
 //	an empty directory, and a bitmap of free sectors (with almost but
@@ -91,68 +84,6 @@
 //----------------------------------------------------------------------
 
 FileSystem::FileSystem(bool format)
-<<<<<<< HEAD
-{   
-    DEBUG(dbgFile, "Initializing the file system.");
-    if (format) {
-        PersistentBitmap *freeMap = new PersistentBitmap(NumSectors);
-        Directory *directory = new Directory(NumDirEntries);
-	FileHeader *mapHdr = new FileHeader;
-	FileHeader *dirHdr = new FileHeader;
-
-        DEBUG(dbgFile, "Formatting the file system.");
-
-    // First, allocate space for FileHeaders for the directory and bitmap
-    // (make sure no one else grabs these!)
-	freeMap->Mark(FreeMapSector);	    
-	freeMap->Mark(DirectorySector);
-
-    // Second, allocate space for the data blocks containing the contents
-    // of the directory and bitmap files.  There better be enough space!
-
-	ASSERT(mapHdr->Allocate(freeMap, FreeMapFileSize));
-	ASSERT(dirHdr->Allocate(freeMap, DirectoryFileSize));
-
-    // Flush the bitmap and directory FileHeaders back to disk
-    // We need to do this before we can "Open" the file, since open
-    // reads the file header off of disk (and currently the disk has garbage
-    // on it!).
-
-        DEBUG(dbgFile, "Writing headers back to disk.");
-	mapHdr->WriteBack(FreeMapSector);    
-	dirHdr->WriteBack(DirectorySector);
-
-    // OK to open the bitmap and directory files now
-    // The file system operations assume these two files are left open
-    // while Nachos is running.
-
-        freeMapFile = new OpenFile(FreeMapSector);
-        directoryFile = new OpenFile(DirectorySector);
-     
-    // Once we have the files "open", we can write the initial version
-    // of each file back to disk.  The directory at this point is completely
-    // empty; but the bitmap has been changed to reflect the fact that
-    // sectors on the disk have been allocated for the file headers and
-    // to hold the file data for the directory and bitmap.
-
-        DEBUG(dbgFile, "Writing bitmap and directory back to disk.");
-	freeMap->WriteBack(freeMapFile);	 // flush changes to disk
-	directory->WriteBack(directoryFile);
-
-	if (debug->IsEnabled('f')) {
-	    freeMap->Print();
-	    directory->Print();
-        }
-        delete freeMap; 
-	delete directory; 
-	delete mapHdr; 
-	delete dirHdr;
-    } else {
-    // if we are not formatting the disk, just open the files representing
-    // the bitmap and directory; these are left open while Nachos is running
-        freeMapFile = new OpenFile(FreeMapSector);
-        directoryFile = new OpenFile(DirectorySector);
-=======
 {
     DEBUG(dbgFile, "Initializing the file system.");
     if (format)
@@ -236,7 +167,6 @@ FileSystem::FileSystem(bool format)
         fileHrdMap = new FileHdrMap;
         RestoreFromCheckPoint();
     #endif
->>>>>>> 5e468e60b4ff28e92fb94c15b02a40230e8fff93
     }
 }
 
@@ -314,8 +244,6 @@ FileSystem::Create(char *name, int initialSize)
     return success;
 }
 
-<<<<<<< HEAD
-=======
 #ifdef LOG_FS
 //---------------------------------------------------------------------
 /// Create a file whose inital size zero, in another word, this will only
@@ -342,7 +270,6 @@ FileSystem::Create(char* name)
 
 #endif
 
->>>>>>> 5e468e60b4ff28e92fb94c15b02a40230e8fff93
 //----------------------------------------------------------------------
 // FileSystem::Open
 // 	Open a file for reading and writing.  
@@ -513,8 +440,6 @@ FileSystem::Print()
     delete directory;
 } 
 
-<<<<<<< HEAD
-=======
 #ifdef LOG_FS
 //--------------------------------------------------------------------
 // Save maps into disk
@@ -722,5 +647,4 @@ void FileSystem::CleanSegments()
 }
 #endif
 
->>>>>>> 5e468e60b4ff28e92fb94c15b02a40230e8fff93
 #endif // FILESYS_STUB
