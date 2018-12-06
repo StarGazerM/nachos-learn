@@ -144,6 +144,7 @@ FileSystem::FileSystem(bool format)
         delete dirHdr;
     #else
         fileHrdMap = new FileHdrMap;
+        currentSeg = 0;
         // init all segment
         // TODO: if possible change to RAII style
         for(int i= 0; i < NumSeg; i++)

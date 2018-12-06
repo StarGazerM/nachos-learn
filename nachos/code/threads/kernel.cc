@@ -110,8 +110,8 @@ Kernel::Initialize()
         diskCleanDaemon->Fork((VoidFunctionPtr)segmentCleanDaemonThread, (void*)-1);
     #else
         synchDisk = new SynchDisk();
-        fileSystem = new FileSystem(formatFlag);
     #endif
+    fileSystem = new FileSystem(formatFlag);
 
 
 #endif // FILESYS_STUB
