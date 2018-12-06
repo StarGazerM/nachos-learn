@@ -124,7 +124,7 @@ int FileHdrMap::FindFileHeader(int nameHash) throw (std::out_of_range)
     {
         if(nameHash == fd.fileHashCode)
         {
-            sector = fd.fileHashCode;
+            sector = fd.logOffset;
             break;
         }
     }

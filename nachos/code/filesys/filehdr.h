@@ -62,10 +62,11 @@ class IndirectHeader
     void Deallocate(PersistentBitmap *freeMap);
     void FetchFrom(int sectorNumber); 	
     void WriteBack(int sectorNumber);
-    void UpdateSectorNum(int offset, int newSector, int nameHash);  
 #ifndef LOG_FS 	
     int ByteToSector(int offset, PersistentBitmap *freeMap);
 #else
+    void UpdateSectorNum(int offset, int newSector, int nameHash);  
+    void ReplaceSectorNum(int oldSectot, int newSector, int nameHash);
     int ByteToSector(int offset);
 #endif
 };
@@ -124,6 +125,7 @@ class FileHeader {
                     // another sector, this operation need to be carefull.
                     // cause the correctness is not ensured in function itself
                     // it may also useful in COW
+    void ReplaceSectorNum(int oldSector, int newSector, int nameHash);
 #endif
 
     int FileLength();			// Return the length of the file 

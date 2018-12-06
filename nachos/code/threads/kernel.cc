@@ -249,6 +249,7 @@ Kernel::NetworkTest() {
     // Then we're done!
 }
 
+#ifdef LOG_FS
 void
 segmentCleanDaemonThread(int flag)
 {
@@ -261,3 +262,4 @@ segmentCleanDaemonThread(int flag)
         kernel->currentThread->Yield();
     }
 }
+#endif

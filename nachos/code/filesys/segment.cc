@@ -106,7 +106,7 @@ int DiskSegment::AllocateSector(int nameHash, int version)
 void DiskSegment::DelocateSector(int sectorNum)
 {
     ASSERT(sectorNum <= end) // this should be a sector already used
-    usageTable->Clear(sectorNum - begin); // mark it as dead
+    usageTable->Clear(sectorNum - begin - 1); // mark it as dead
 }
 //-----------------------------------------------------------
 // DiskSegment::Write
@@ -121,7 +121,6 @@ void DiskSegment::DelocateSector(int sectorNum)
 //     int pos = end + 1;
 //     int currentData = 0;
 //     int secNum = divRoundUp(len, SectorSize);
-//     // FIXME: right now we can only write a whole sector in...
 //     for(int i = 0; i < secNum; i++)
 //     {
 //         kernel->synchDisk->WriteSector(end+i, &(data[currentData]));

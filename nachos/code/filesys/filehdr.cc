@@ -68,6 +68,18 @@ IndirectHeader::UpdateSectorNum(int offset, int newSector, int nameHash)
     dataSectors[offset] = newSector;
 }
 
+void
+IndirectHeader::ReplaceSectorNum(int oldSector, int newSector, int nameHash)
+{
+    for(int i = 0; i < NumData; i++)
+    {
+        if(dataSectors[i] == oldSector)
+        {
+            dataSectors[i] = newSector;
+        }
+    }
+}
+
 #ifndef LOG_FS
 int 
 IndirectHeader::ByteToSector(int offset, PersistentBitmap *freeMap)
@@ -571,7 +583,7 @@ FileHeader::UpdateSectorNum(int offset, int newSector, int nameHash)
 {
     // first of all find that sector
     int originalSec;
-    ASSERT(offset <= numSectors*SectorSize)
+    // ASSERT(offset - SectorSize*begin <= numSectors*SectorSize)
     if(offset < NumDirect*SectorSize)
     {
         if(dataSectors[offset / SectorSize] != -1)
@@ -618,6 +630,40 @@ FileHeader::UpdateSectorNum(int offset, int newSector, int nameHash)
         // dtmp->FetchFrom(doubleIndirect);
         // originalSec = dtmp->ByteToSector(current);
         // delete dtmp;
+    }
+}
+
+void
+FileHeader::ReplaceSectorNum(int oldSector, int newSector, int nameHash)
+{
+    // first of all find that sector
+    int originalSec;
+    // ASSERT(offset - SectorSize*begin <= numSectors*SectorSize)
+    for(int i = 0; i < NumDirect; i++)
+    {
+        if(dataSectors[i] == oldSector)
+        {
+            dataSectors[i] = newSector;
+        }
+    }
+    for(int i = 0; i < NumIndirect; i++)
+    {
+        IndirectHeader *idtmp = new IndirectHeader;
+        idtmp->FetchFrom(indirects[i]);
+        idtmp->ReplaceSectorNum(oldSector, newSector, nameHash);
+        int currentSegNum = kernel->fileSystem->currentSeg;
+        DiskSegment *seg = kernel->fileSystem->segTable[currentSegNum];
+        int newIndirectSecNum = seg->AllocateSector(nameHash, std::time(nullptr));
+        // make original head as dead
+        if(indirects[i] != -1)
+        {
+            int originalSegNum = (indirects[i]/SegSize) - 1;
+            kernel->fileSystem->segTable[originalSegNum]->DelocateSector(indirects[i]);
+        }
+        indirects[i] = newIndirectSecNum;
+        idtmp->WriteBack(newIndirectSecNum);
+        delete idtmp;
+        return;
     }
 }
 #endif
