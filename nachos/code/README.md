@@ -50,13 +50,14 @@ Building and starting user-level programs in NachOS:
     - 3.3 删除操作位于最低优先级，并发时先处理读写 **x**
 
 ## log structure file system
-1. 构建ADT **√**
+
+> 在makefile中删除-DLOG_FS标记并删除相关文件项（TODO，MakeFile要改）
+1. 构建ADT 
     - FileHeaderMap, 保存filedeader在log中的位置， 实际上等于在磁盘上的位置，此处需缓存map！
     - Segment, 保存当前段在磁盘中的offset， seg 中存放一个块做segment sumary
     - SegmentSummary, 保存段内文件的编号和对应的文件块在段内的偏移， 操作时间，版本号
     - SegmentMap, 保存segment在磁盘上的起始地址, 段内的live byte, 该segment的最后操作时间
     - CheckPoint, 保存当前的FileHeaderMap和SegmentMap，当前日志的结尾指针
-
 
     > **NOTE：** 当前节点中只有文件名，考虑到文件名可以保证唯一性，使用文件名哈希值来作为文件编号可以保证唯一性（看下c++的md5运算, 需要引入c11支持）
 2. 段清理
@@ -75,7 +76,11 @@ Building and starting user-level programs in NachOS:
     - 写盘操作被触发时， 刷写当前buffer到硬盘上的log结尾
 
 5. 读操作
-    - 查询cache中的fileheadermap即可
+    - 查询fileheadermap, 可以打开文件
+    - 读取sector时直接从文件中读取
+
+6. 删除操作
+    - 直接删除fileheadermap中的记录
 
 
 

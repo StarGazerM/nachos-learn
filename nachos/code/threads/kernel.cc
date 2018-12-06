@@ -101,16 +101,18 @@ Kernel::Initialize()
     machine = new Machine(debugUserProg);
     synchConsoleIn = new SynchConsoleInput(consoleIn); // input from stdin
     synchConsoleOut = new SynchConsoleOutput(consoleOut); // output to stdout
-    synchDisk = new WithLogCache(new SynchDisk());    //
 #ifdef FILESYS_STUB
     fileSystem = new FileSystem();
 #else
-    fileSystem = new FileSystem(formatFlag);
+    #ifdef LOG_FS
+        synchDisk = new WithLogCache(new SynchDisk());    //
+        diskCleanDaemon = new Thread("diskCleanDaemon");
+        diskCleanDaemon->Fork((VoidFunctionPtr)segmentCleanDaemonThread, (void*)-1);
+    #else
+        synchDisk = new SynchDisk();
+        fileSystem = new FileSystem(formatFlag);
+    #endif
 
-#ifdef LOG_FS
-    diskCleanDaemon = new Thread("diskCleanDaemon");
-    diskCleanDaemon->Fork((VoidFunctionPtr)segmentCleanDaemonThread, (void*)-1);
-#endif
 
 #endif // FILESYS_STUB
     postOfficeIn = new PostOfficeInput(10);

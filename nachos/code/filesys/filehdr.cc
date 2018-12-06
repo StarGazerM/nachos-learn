@@ -55,6 +55,19 @@ IndirectHeader::WriteBack(int sector)
     kernel->synchDisk->WriteSector(sector, (char *)this); 
 }
 
+#ifndef LOG_FS
+int 
+IndirectHeader::ByteToSector(int offset, PersistentBitmap *freeMap)
+{
+    if (dataSectors[offset] = -1)   // byte on new sector
+    {
+        dataSectors[offset] = freeMap->FindAndSet();
+        freeMap->WriteBack(kernel->fileSystem->GetFreeMap());
+    }
+    return dataSectors[offset];
+}
+#else
+
 void
 IndirectHeader::UpdateSectorNum(int offset, int newSector, int nameHash)
 {
@@ -80,18 +93,6 @@ IndirectHeader::ReplaceSectorNum(int oldSector, int newSector, int nameHash)
     }
 }
 
-#ifndef LOG_FS
-int 
-IndirectHeader::ByteToSector(int offset, PersistentBitmap *freeMap)
-{
-    if (dataSectors[offset] = -1)   // byte on new sector
-    {
-        dataSectors[offset] = freeMap->FindAndSet();
-        freeMap->WriteBack(kernel->fileSystem->GetFreeMap());
-    }
-    return dataSectors[offset];
-}
-#else
 int 
 IndirectHeader::ByteToSector(int offset)
 {

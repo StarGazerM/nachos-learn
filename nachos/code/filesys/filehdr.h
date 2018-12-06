@@ -85,10 +85,10 @@ class DoubleIndirectHeader
     void Deallocate(PersistentBitmap *freeMap);
     void FetchFrom(int sectorNumber); 	
     void WriteBack(int sectorNumber);
-    void UpdateSectorNum(int offset, int newSector, int hash);  
 #ifndef LOG_FS 	
     int ByteToSector(int offset, PersistentBitmap *freeMap);
 #else
+    void UpdateSectorNum(int offset, int newSector, int hash);  
     int ByteToSector(int offset);
 #endif
 };

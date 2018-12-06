@@ -4,6 +4,7 @@
 #include "filehdr.h"
 // #include <fstream>
 
+#ifdef LOG_FS
 void checkSegment()
 {
     int dirty = 0;
@@ -90,11 +91,13 @@ TestRestore(int ww)
     kernel->interrupt->Halt();
 }
 
+#endif
 void
 ThreadTest()
 {
     Thread *t = new Thread("forked thread");
-    t->Fork((VoidFunctionPtr)TestCreate, (void *) 1);
+
+    // t->Fork((VoidFunctionPtr)TestCreate, (void *) 1);
     
     // SimpleThread(0);
 }
