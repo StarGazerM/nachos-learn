@@ -88,7 +88,8 @@ class DoubleIndirectHeader
 #ifndef LOG_FS 	
     int ByteToSector(int offset, PersistentBitmap *freeMap);
 #else
-    void UpdateSectorNum(int offset, int newSector, int hash);  
+    void UpdateSectorNum(int offset, int newSector, int hash); 
+    void ReplaceSectorNum(int oldSectot, int newSector, int nameHash);
     int ByteToSector(int offset);
 #endif
 };

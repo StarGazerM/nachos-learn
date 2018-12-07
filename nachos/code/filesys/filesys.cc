@@ -303,6 +303,11 @@ FileSystem::Open(char *name)
         openFile = alreadyOpenned;
     }
 
+    if(openFile != NULL)
+    {
+        kernel->openedFileList.push_back(openFile);
+    }
+
     return openFile;				// return NULL if not found
 }
 
@@ -316,6 +321,12 @@ OpenFile *
 FileSystem::Open(char *name)
 {
     // Directory *directory = new Directory(NumDirEntries);
+    auto it = std::find_if(kernel->openedFileList.begin(), kernel->openedFileList.end(),
+                        [&](OpenFile *fd){ return fd->GetFileName() == name;});
+    if(it != kernel->openedFileList.end())
+    {
+        return (*it);
+    }
     int sector; 
     OpenFile *openFile = NULL;
     try
@@ -328,6 +339,10 @@ FileSystem::Open(char *name)
         Abort();   
     }
     openFile = new OpenFile(sector, name);
+    if(openFile != NULL)
+    {
+        kernel->openedFileList.push_back(openFile);
+    }
     return openFile;
 }
 
@@ -620,14 +635,22 @@ void FileSystem::CleanSegments()
         // update file hdr map, the write back of file header should be done at last
         try
         {
+            int newSec;
             int origanlHdrSec = fileHrdMap->FindFileHeader(fileName);
+            // check whether this block is inode! if it is inode, replace 
+            // it in inode map
             FileHeader *hdr = new FileHeader;
+            if(originalSec == origanlHdrSec)
+            {
+                goto SET_HDR_ONLY;
+            }
             hdr->FetchFrom(origanlHdrSec);
             // write data
-            int newSec = (*cleanSeg)->AllocateSector(fileName, version);
+            newSec = (*cleanSeg)->AllocateSector(fileName, version);
             // (*cleanSeg)->Write(SectorSize, datatmp);
             kernel->synchDisk->WriteSector(newSec, datatmp);
             hdr->ReplaceSectorNum(originalSec, newSec, fileName);
+        SET_HDR_ONLY:
             hdrBuf[hdr] = p.second;
             
         }

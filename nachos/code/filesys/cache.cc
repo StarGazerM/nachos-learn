@@ -132,8 +132,9 @@ void ReadCache::UpdateOrAdd(int sec, char* data)
     {
         in_buf[i] = data[i];
     }
-    if(buffer.size() == BUFFER_SIZE)    // overflow
+    if(buffer.size() > 2*16)    // overflow
     {
+        // cout << "read buffersize is " << buffer.size();
         buffer.erase(buffer.begin());   //FIFO
     }
     buffer[sec] = in_buf;

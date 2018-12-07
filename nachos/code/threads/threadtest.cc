@@ -2,6 +2,7 @@
 #include "main.h"
 #include "thread.h"
 #include "filehdr.h"
+#include <sstream>
 
 #ifdef LOG_FS
 void checkSegment()
@@ -47,7 +48,9 @@ TestCreate(int which)
     {
         file1->AppendOneSector(&(oneSector[0]), 128);
     }
+    cout << "writting below will on indirect and double indirect node, which has exceed the writing limit of original file" << endl;
     file1->AppendOneSector(&(oneSector[0]), 128);
+    cout << "start test writing f1----------------" << endl;
 
     cout << "start test writing f2----------------" << endl;
     OpenFile * file2 = kernel->fileSystem->Open("f2");
@@ -56,12 +59,31 @@ TestCreate(int which)
         file2->AppendOneSector(&(oneSector[0]), 128);
     }
 
-    cout << "start test reading f2----------------" << endl;
-    char tmp[18];
+    char tmp[18]; // read tmp
+    cout << "start test reading f1 tail----------------" << endl;
     file1->ReadAt(tmp,16, 2560);
     tmp[16] = '\0';
     cout << tmp << endl;
     checkSegment();
+
+    cout << "start test reading f2 tail----------------" << endl;
+    file2->ReadAt(tmp,16, 2304);
+    tmp[16] = '\0';
+    cout << tmp << endl;
+    checkSegment();
+
+    cout << "test creating more than 10 file, which can be hold by original nachos dictornay" << endl;
+    for(int i = 3; i < 12; i++)
+    {
+        char* ntmp = new char[8]; 
+        sprintf(ntmp, "f%d", i);
+        if(kernel->fileSystem->Create(ntmp))
+        {
+            // OpenFile * f = kernel->fileSystem->Open(ntmp);
+            // f->AppendOneSector(&(oneSector[0]), 128);
+            cout << "create " << ntmp << " success" << endl;
+        }
+    }
 
     cout << "delete file 2----------------" << endl;
     kernel->fileSystem->Remove("f2");
@@ -71,7 +93,14 @@ TestCreate(int which)
                                         // this, in kernel, there is a daemon process
                                         // will clean it when clean segment size drop
                                         // bellow 20.
+    cout << "block in file2 should be cleaned" << endl;
     checkSegment();
+
+    cout << "start test reading f1 middle----------------" << endl;
+    file1->ReadAt(tmp,16, 128);
+    tmp[16] = '\0';
+    cout << tmp << endl;
+    cout << "test finish, shutdown machine, I/O stat will shows cache is working!" << endl;
     kernel->interrupt->Halt();
 }
 void
@@ -219,8 +248,6 @@ TestThreadX(int which)
 
 }
 
-#endif
-
 void
 SimpleThread(int which)
 {
@@ -295,11 +322,14 @@ SyncReadTest(int which)
     intor[4] = '\0';
     cout<<"Reader #"<<which<<" read "<<intor<<"\n";
 }
+#endif
+
 
 void
 ThreadTest()
 {   
  
+ #ifndef LOG_FS
     Thread *t = new Thread("forked thread");
     t->Fork((VoidFunctionPtr) SyncCreate, (void *) 1);
     // Create 5 writer
@@ -312,10 +342,9 @@ ThreadTest()
         Thread *t = new Thread("forked thread");
         t->Fork((VoidFunctionPtr) SyncReadTest, (void *) i);
     }
-
-
-    // Thread *t1 = new Thread("forked thread");
-    // t1->Fork((VoidFunctionPtr) TestCreate, (void *) 1);
-    
+#else
+    Thread *t1 = new Thread("forked thread");
+    t1->Fork((VoidFunctionPtr) TestCreate, (void *) 1);
+#endif
     // SimpleThread(0);
 }

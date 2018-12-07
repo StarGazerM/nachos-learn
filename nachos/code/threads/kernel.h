@@ -60,6 +60,7 @@ class Kernel {
     FileSystem *fileSystem;     
     PostOfficeInput *postOfficeIn;
     PostOfficeOutput *postOfficeOut;
+    std::vector<OpenFile*> openedFileList;
 
     int hostName;               // machine identifier
 

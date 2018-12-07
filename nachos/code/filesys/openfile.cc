@@ -230,6 +230,9 @@ int OpenFile::WriteAt(char *from, int numBytes, int position)
 // if you want to add content to a file, use Append instead
 int OpenFile::WriteAt(char *from, int numBytes, int position)
 {
+    // do sync here, however, our test is in **kenel program**
+    // concurrency is not a problem here, cause every routine 
+    // is atomic
     kernel->currentThread->SetCurrentFD(this);
     int fileLength = hdr->FileLength();
     int i, firstSector, lastSector, numSectors;

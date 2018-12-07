@@ -639,6 +639,10 @@ FileHeader::UpdateSectorNum(int offset, int newSector, int nameHash)
 void
 FileHeader::ReplaceSectorNum(int oldSector, int newSector, int nameHash)
 {
+    if(dataSectors[0] == -1)
+    {
+        return;
+    }
     // first of all find that sector
     int originalSec;
     // ASSERT(offset - SectorSize*begin <= numSectors*SectorSize)
@@ -647,6 +651,7 @@ FileHeader::ReplaceSectorNum(int oldSector, int newSector, int nameHash)
         if(dataSectors[i] == oldSector)
         {
             dataSectors[i] = newSector;
+            return;
         }
     }
     for(int i = 0; i < NumIndirect; i++)
