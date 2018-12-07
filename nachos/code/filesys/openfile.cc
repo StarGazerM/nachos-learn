@@ -165,7 +165,7 @@ int OpenFile::WriteAt(char *from, int numBytes, int position)
     int i, firstSector, lastSector, numSectors;
     bool firstAligned, lastAligned;
     char *buf;
-
+     
     if (numBytes <= 0)
         return 0; // check request
     if ((position + numBytes) > fileLength)
@@ -203,7 +203,7 @@ int OpenFile::WriteAt(char *from, int numBytes, int position)
     }
 
     bcopy(from, &buf[position - (firstSector * SectorSize)], numBytes);
-
+    hdr->SetFileLength(numBytes+fileLength); //update file length
     // The original Nachos will only write back the modified sector
     // We changed the iteration style, because when writing back the last sector,
     // the input of ByteToSector() needs to be the last byte of the file.

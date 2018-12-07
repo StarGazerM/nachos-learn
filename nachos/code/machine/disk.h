@@ -47,7 +47,11 @@
 //
 // The track buffer simulation can be disabled by compiling with -DNOTRACKBUF
 
+#ifdef LOG_FS
 const int SectorSize = 128;		// number of bytes per disk sector
+#else
+const int SectorSize = 256;
+#endif 
 const int SectorsPerTrack  = 32;	// number of sectors per disk track 
 const int NumTracks = 32;		// number of tracks per disk
 const int NumSectors = (SectorsPerTrack * NumTracks);

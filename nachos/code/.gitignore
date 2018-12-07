@@ -1,0 +1,5 @@
+SOCKET_0
+DISK_0
+evaluation.md
+build.linux/*.o
+build.linux/nachos

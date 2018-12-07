@@ -131,121 +131,79 @@ TestThreadX(int which)
     //in order to meet 128 MB file size, change disk sector size from 128 to 256.
     //since exsitence of directory file header and freeMap file header and file header, the 
     //largest file size cannot meet excat 1024*128.
+    printf("Test Case 1: Create a file with the size of 128 MB.\n");
     if(kernel->fileSystem->Create("maxFile",128*1024)){
-        //do not print bitmap in here
         //change disk size to 256
-        cout<<"\nmaxFile file ith a file size of 128*1024 has been created successfully"<< endl;
+        kernel->fileSystem->Print();
+        printf("maxFile file with a file size of 128*1024 has been created successfully\n");
         OpenFile* test = kernel->fileSystem->Open("maxFile");
         if(kernel->fileSystem->Remove("maxFile"))
         {
-            cout<<"maxFile has been removed successfully.\n" <<endl;
+            printf("maxFile has been removed successfully.\n");
         }
     }
     else {
-        cout<< "file not create"<<endl;
+        printf("file cannot create\n");
     }
-    if(kernel->fileSystem->Create("test0",256*15)){
-        
-        cout<<"\ntest1 file ith a file size of 256*31 has been created successfully"<< endl;
-        OpenFile* test0 = kernel->fileSystem->Open("test0");
-        test0->Seek(255);
-        test0->Write("Case11234567890123456789012345678901234567890", 45);
-        
-        char buffer[45];
-        test0->Seek(255);
-        test0->Read(buffer, 45);
-        
-        buffer[45] = '\0';
-        cout<<"File contents: "<< buffer << endl;
-        //kernel->fileSystem->Print();
-        if(kernel->fileSystem->Remove("test0"))
-        {
-            cout<<"test1 has been removed successfully.\n" <<endl;
-        }
-    }
-    if(kernel->fileSystem->Create("test1",256*31)){
-        
-        cout<<"\ntest1 file ith a file size of 256*31 has been created successfully"<< endl;
-        OpenFile* test1 = kernel->fileSystem->Open("test1");
-        test1->Seek(255);
-        test1->Write("Case11234567890123456789012345678901234567890", 45);
-      
-        char buffer[45];
-        test1->Seek(255);
-        test1->Read(buffer, 45);
-       
-        buffer[45] = '\0';
-        cout<<"File contents: "<< buffer << endl;
-        //kernel->fileSystem->Print();
-        if(kernel->fileSystem->Remove("test1"))
-        {
-            cout<<"test1 has been removed successfully.\n" <<endl;
-        }
-    }
-    if(kernel->fileSystem->Create("test2",256*53)){
-        //BITMAP PRINTS 0 TO 60 BLOCK
-        cout<<"\ntest 2 file ith a file size of 256*153 has been created successfully"<< endl;
-        OpenFile* test2 = kernel->fileSystem->Open("test2");
-        cout<<"first four bitmap is occupied by directory and freeMap.\n"<<endl;
-        //FILE BLOCK 2 is bit map file header
-        //FILE BLOCK 3 ARE DIRECTORY FILE HEADER
-        //SECTOR 5 IS DIRECTORY CONTENT
-        //file block 5 file header(unconfirm)
-        //FILE BLOCK 6 TO 60
-        // kernel->fileSystem->Print();
-        test2->Seek(255);
-        test2->Write("Case21234567890123456789012345678901234567890", 45);
-        char buffer[45];
-        test2->Seek(255);
-        test2->Read(buffer, 45);
-        buffer[45] = '\0';
-        cout<<"File contents: "<< buffer << endl;
-        
-        if(kernel->fileSystem->Remove("test2"))
-        {
-            cout<<"test 2 has been removed successfully.\n" <<endl;
-        }
-    }
-    if(kernel->fileSystem->Create("test3",256*308)){
-        
-        cout<<"\ntest 4 file ith a file size of 256*308 has been created successfully"<< endl;
-        OpenFile* test3 = kernel->fileSystem->Open("test3");
-        test3->Seek(255);
-        test3->Write("Case3", 5);
-        char buffer[5];
-        test3->Seek(255);
-        test3->Read(buffer, 5);
-        buffer[5] = '\0';
-        cout<<"File contents: "<< buffer << endl;
-        if(kernel->fileSystem->Remove("test3"))
-        {
-            cout<<"test 3 has been removed successfully.\n" <<endl;
-        }
-    }
+    //current maximum in disk
     //Maximum file size in sector size 256
-    if(kernel->fileSystem->Create("test4",256*1012)){
-        cout<<"Maximum file size for sector size 256 bytes\n";
-        cout<<"\ntest 4 file, with a file size of 256*1012, that occupies every free disk has been created successfully"<< endl;
-        OpenFile* test4 = kernel->fileSystem->Open("test4");
-        
-        test4->Seek(255);
-        test4->Write("Case4", 5);
-        char buffer[5];
-        test4->Seek(255);
-        
-        test4->Read(buffer, 5);
-        buffer[5] = '\0';
-        cout<<"File contents: "<< buffer << endl;
-        if(kernel->fileSystem->Remove("test4"))
+    printf("\nTest Case 2: Create a file with the maximum size, which occupies almost every free disk.\n");
+    if(kernel->fileSystem->Create("test",256*1012)){
+        // cout<<"Maximum file size for sector size 256 bytes\n";
+        kernel->fileSystem->Print();
+        cout<<"test file with a file size of 256*1012 has been created successfully"<< endl;
+        OpenFile* test = kernel->fileSystem->Open("test");
+        if(kernel->fileSystem->Remove("test"))
         {
-            cout<<"test 4 has been removed successfully.\n" <<endl;
+            cout<<"test has been removed successfully.\n" <<endl;
         }
     }
     else
     {
-        cout<<"Test file 4 cannot create"<<endl;
+        cout<<"Test file cannot create"<<endl;
+    }
+    printf("\nTest Case 3: Create a file with a size of 256 * 15. Test write/read file extension\n");
+    if(kernel->fileSystem->Create("test0",256*15)){
+        
+        cout<<"test0 file ith a file size of 256*31 has been created successfully"<< endl;
+        OpenFile* test0 = kernel->fileSystem->Open("test0");
+        printf("Current file size %i\n",test0->Length());
+        test0->Seek(255);
+        test0->Write("Case3: This is extension test", 29);
+        printf("write data into disk successfully\n");
+        char buffer[29];
+        test0->Seek(255);
+        test0->Read(buffer, 29);
+        printf("read data from disk successfully\n");
+        printf("Current file size %i\n\n",test0->Length());
+        buffer[29] = '\0';
+        cout<<"File contents:\n"<< buffer << endl;
+        if(kernel->fileSystem->Remove("test0"))
+        {
+            cout<<"\ntest0 has been removed successfully.\n" <<endl;
+        }
     }
 
+    printf("\nTest Case 4: Create a file with a size of 256 * 31. Test write/read file extension\n");
+    if(kernel->fileSystem->Create("test1",256*31)){
+        cout<<"test1 file ith a file size of 256*31 has been created successfully"<< endl;
+        OpenFile* test1 = kernel->fileSystem->Open("test1");
+        test1->Seek(255);
+        test1->Write("Case4: This is extension test", 29);
+        printf("write data into disk successfully\n");
+        printf("Current file size %i\n", test1->Length());
+        char buffer[29];
+        test1->Seek(255);
+        test1->Read(buffer, 29);
+        printf("read data into successfully\n");
+        printf("Current file size %i\n\n",test1->Length());
+        buffer[29] = '\0';
+        cout<<"File contents:\n"<< buffer << endl;
+        if(kernel->fileSystem->Remove("test1"))
+        {
+            cout<<"\ntest1 has been removed successfully.\n" <<endl;
+        }
+    } 
 }
 
 void
@@ -295,41 +253,41 @@ void
 SyncWriteTest(int which)
 {   
     char writerNumber = char(which + 48);
-    char testText[4];
-    testText[0] = 'a';  
-    testText[1] = 'b';
-    testText[2] = 'c';
-    testText[3] = writerNumber;
+    char testText[11] = "TestWrite_";
+    
+
+   
     OpenFile* test = kernel->fileSystem->Open("test2");
     test->Seek(1);
-    test->Write(testText, 4);
+    
+    testText[10] = writerNumber;
+    test->Write(testText, 11);
 
-    char into[10];
+    char into[11];
     test->Seek(1);
-    test->Read(into, 4);
-    into[4] = '\0';
-    cout<<"Writer #"<<which<<" wrote "<<into<<"\n";
+    test->Read(into, 11);
+    into[11] = '\0';
+    cout<<"\nWriter #"<<which<<" wrote "<<into<<"\n";
 }
 
 void
 SyncReadTest(int which)
 {   
-    char intor[10];
+    char intor[11];
     OpenFile* rtest = kernel->fileSystem->Open("test2");
     rtest->Seek(1);
-    rtest->Read(intor, 4);
+    rtest->Read(intor, 11);
     //intor[0] = 'r';
-    intor[4] = '\0';
+    intor[11] = '\0';
     cout<<"Reader #"<<which<<" read "<<intor<<"\n";
 }
-#endif
 
+void TestFileSize() {
+    Thread *t = new Thread("forked thread");
+    t->Fork((VoidFunctionPtr) TestThreadX, (void *) 1);
+}
 
-void
-ThreadTest()
-{   
- 
- #ifndef LOG_FS
+void SyncTest() { 
     Thread *t = new Thread("forked thread");
     t->Fork((VoidFunctionPtr) SyncCreate, (void *) 1);
     // Create 5 writer
@@ -342,9 +300,33 @@ ThreadTest()
         Thread *t = new Thread("forked thread");
         t->Fork((VoidFunctionPtr) SyncReadTest, (void *) i);
     }
+}
+#endif
+
+
+void
+ThreadTest()
+{   
+ 
+ #ifndef LOG_FS
+    // Thread *t = new Thread("forked thread");
+    // t->Fork((VoidFunctionPtr) SyncCreate, (void *) 1);
+    // // Create 5 writer
+    // for(int i = 0; i < 5; i++){
+    //     Thread *t = new Thread("forked thread");
+    //     t->Fork((VoidFunctionPtr) SyncWriteTest, (void *) i);
+    // }
+    // // Create 10 reader
+    // for(int i = 0; i < 10; i++){
+    //     Thread *t = new Thread("forked thread");
+    //     t->Fork((VoidFunctionPtr) SyncReadTest, (void *) i);
+    // }
+    TestFileSize();
 #else
     Thread *t1 = new Thread("forked thread");
     t1->Fork((VoidFunctionPtr) TestCreate, (void *) 1);
 #endif
     // SimpleThread(0);
 }
+
+

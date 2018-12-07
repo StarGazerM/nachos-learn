@@ -242,7 +242,7 @@ FileSystem::Create(char *name, int initialSize)
         delete freeMap;
     }
     delete directory;
-    cout<<"Creating file " << name << " size " << initialSize<<endl;
+    cout<<"Creating file " << name << " size " << initialSize<<" bytes"<<endl;
     return success;
 }
 
@@ -290,7 +290,6 @@ FileSystem::Open(char *name)
     int sector;
 
     DEBUG(dbgFile, "Opening file" << name);
-    cout<<"Opening file "<<name<<endl;
 
     directory->FetchFrom(directoryFile);
     sector = directory->Find(name); 
@@ -366,7 +365,6 @@ FileSystem::Open(char *name)
 bool
 FileSystem::Remove(char *name)
 { 
-    cout<<"Removing file "<<name<<endl;
     Directory *directory;
     PersistentBitmap *freeMap;
     FileHeader *fileHdr;
@@ -381,7 +379,6 @@ FileSystem::Remove(char *name)
     }
     fileHdr = new FileHeader;
     fileHdr->FetchFrom(sector);
-    printf("file size: %i",fileHdr->FileLength());
 
     freeMap = new PersistentBitmap(freeMapFile,NumSectors);
 
@@ -437,28 +434,28 @@ FileSystem::List()
 void
 FileSystem::Print()
 {
-    FileHeader *bitHdr = new FileHeader;
-    FileHeader *dirHdr = new FileHeader;
+    // FileHeader *bitHdr = new FileHeader;
+    // FileHeader *dirHdr = new FileHeader;
     PersistentBitmap *freeMap = new PersistentBitmap(freeMapFile,NumSectors);
-    Directory *directory = new Directory(NumDirEntries);
+    // Directory *directory = new Directory(NumDirEntries);
 
-    printf("Bit map file header:\n");
-    bitHdr->FetchFrom(FreeMapSector);
-    bitHdr->Print();
+    // printf("Bit map file header:\n");
+    // bitHdr->FetchFrom(FreeMapSector);
+    // bitHdr->Print();
 
-    printf("Directory file header:\n");
-    dirHdr->FetchFrom(DirectorySector);
-    dirHdr->Print();
+    // printf("Directory file header:\n");
+    // dirHdr->FetchFrom(DirectorySector);
+    // dirHdr->Print();
 
     freeMap->Print();
 
-    directory->FetchFrom(directoryFile);
-    directory->Print();
+    // directory->FetchFrom(directoryFile);
+    // directory->Print();
 
-    delete bitHdr;
-    delete dirHdr;
+    // delete bitHdr;
+    // delete dirHdr;
     delete freeMap;
-    delete directory;
+    // delete directory;
 } 
 
 #ifdef LOG_FS
@@ -646,7 +643,7 @@ void FileSystem::CleanSegments()
             }
             hdr->FetchFrom(origanlHdrSec);
             // write data
-            newSec = (*cleanSeg)->AllocateSector(fileName, version);
+            newSec = (*cleanSeg)->AllocateSector(fileName, version);            
             // (*cleanSeg)->Write(SectorSize, datatmp);
             kernel->synchDisk->WriteSector(newSec, datatmp);
             hdr->ReplaceSectorNum(originalSec, newSec, fileName);
